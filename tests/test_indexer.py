@@ -18,9 +18,18 @@ class IndexerTests(unittest.TestCase):
             result = build_indexes(repo)
 
             generated_dir = repo / "generated"
+            self.assertTrue((generated_dir / "manifest.json").exists())
             self.assertTrue((generated_dir / "index.json").exists())
             self.assertTrue((generated_dir / "capabilities.json").exists())
             self.assertEqual(result["capabilities"]["vector_search"][0]["id"], "bpg.nodes.weaviate")
+            self.assertEqual(result["manifest"]["indexes"]["manifest"], "generated/manifest.json")
 
             index_payload = json.loads((generated_dir / "index.json").read_text(encoding="utf-8"))
             self.assertEqual(len(index_payload["artifacts"]), 4)
+
+            manifest_payload = json.loads((generated_dir / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest_payload["artifact_types"][0]["type"], "node_package")
+            self.assertEqual(
+                manifest_payload["artifact_types"][0]["primary_index"],
+                "generated/capabilities.json",
+            )

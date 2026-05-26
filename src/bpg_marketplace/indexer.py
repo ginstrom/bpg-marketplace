@@ -4,7 +4,15 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from .registry import generated_root, iter_registry_files, load_json, write_json
+from .registry import (
+    ARTIFACT_DIRS,
+    generated_root,
+    iter_registry_files,
+    load_json,
+    registry_root,
+    schema_root,
+    write_json,
+)
 
 
 def build_indexes(root: Path | None = None) -> dict[str, Any]:
@@ -51,6 +59,30 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
         "capabilities": normalized_capabilities,
         "templates": {"templates": templates},
         "compatibility": {"artifacts": sorted(compatibility, key=lambda item: item["id"])},
+        "manifest": {
+            "artifact_types": [
+                {
+                    "type": artifact_type,
+                    "directory": str(registry_root(root) / directory),
+                    "schema": str(schema_root(root) / f"{artifact_type.removesuffix('_package')}.schema.json"),
+                    "primary_index": (
+                        "generated/templates.json"
+                        if artifact_type == "template"
+                        else "generated/capabilities.json"
+                        if artifact_type == "node_package"
+                        else "generated/index.json"
+                    ),
+                }
+                for artifact_type, directory in ARTIFACT_DIRS.items()
+            ],
+            "indexes": {
+                "manifest": "generated/manifest.json",
+                "index": "generated/index.json",
+                "capabilities": "generated/capabilities.json",
+                "templates": "generated/templates.json",
+                "compatibility": "generated/compatibility.json",
+            },
+        },
     }
 
     output_root = generated_root(root)
@@ -58,4 +90,5 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
     write_json(output_root / "capabilities.json", result["capabilities"])
     write_json(output_root / "templates.json", result["templates"])
     write_json(output_root / "compatibility.json", result["compatibility"])
+    write_json(output_root / "manifest.json", result["manifest"])
     return result
