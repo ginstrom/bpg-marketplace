@@ -1,0 +1,22 @@
+{
+  "id": "bpg.policies.hitl_approval",
+  "name": "HITL Approval Policy",
+  "type": "policy",
+  "summary": "Requires explicit human approval before deployment-class actions.",
+  "capabilities": [
+    "human_approval",
+    "workflow_pause",
+    "workflow_resume"
+  ],
+  "rules": [
+    "deployment actions require a human approval checkpoint",
+    "approval decisions must emit audit logs",
+    "paused workflows must be resumable without duplicate side effects"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "trust": {
+    "level": "verified"
+  }
+}

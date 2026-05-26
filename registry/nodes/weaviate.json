@@ -1,0 +1,44 @@
+{
+  "id": "bpg.nodes.weaviate",
+  "name": "Weaviate Nodes",
+  "type": "node_package",
+  "package": {
+    "python": "bpg-nodes-weaviate",
+    "install": "uv add bpg-nodes-weaviate"
+  },
+  "source": {
+    "repo": "https://github.com/example/bpg-nodes-weaviate"
+  },
+  "capabilities": [
+    "vector_search",
+    "hybrid_search",
+    "vector_upsert"
+  ],
+  "nodes": [
+    {
+      "id": "weaviate.search",
+      "retryable": true,
+      "idempotent": true,
+      "side_effects": ["network_io"]
+    },
+    {
+      "id": "weaviate.upsert",
+      "retryable": true,
+      "idempotent": true,
+      "side_effects": ["network_io", "data_write"]
+    }
+  ],
+  "requirements": {
+    "secrets": ["WEAVIATE_API_KEY"]
+  },
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "observability": {
+    "traces": true,
+    "metrics": true
+  },
+  "trust": {
+    "level": "verified"
+  }
+}

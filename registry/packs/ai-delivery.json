@@ -1,0 +1,22 @@
+{
+  "id": "bpg.packs.ai_delivery",
+  "name": "AI Delivery Pack",
+  "type": "pack",
+  "summary": "Starter capability pack for retrieval-backed AI delivery workflows.",
+  "includes": [
+    "bpg.nodes.weaviate",
+    "bpg.templates.enterprise_rag",
+    "bpg.policies.hitl_approval"
+  ],
+  "capabilities": [
+    "vector_search",
+    "human_approval",
+    "audit_logging"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "trust": {
+    "level": "community"
+  }
+}

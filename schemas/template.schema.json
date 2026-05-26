@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BPG Workflow Template",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "type",
+    "summary",
+    "capabilities",
+    "references",
+    "compatibility",
+    "trust"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^bpg\\.[a-z0-9_.-]+$"
+    },
+    "name": {"type": "string", "minLength": 1},
+    "type": {"const": "template"},
+    "summary": {"type": "string", "minLength": 1},
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+      "uniqueItems": true
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["example_path", "required_nodes"],
+      "properties": {
+        "example_path": {"type": "string", "minLength": 1},
+        "required_nodes": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^bpg\\.[a-z0-9_.-]+$"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bpg"],
+      "properties": {
+        "bpg": {"type": "string", "minLength": 1}
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["community", "verified", "blessed", "deprecated"]
+        }
+      }
+    }
+  }
+}

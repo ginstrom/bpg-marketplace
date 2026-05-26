@@ -1,0 +1,14 @@
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.coverage
+coverage.xml
+
+# Generated discovery artifacts can be rebuilt from source metadata.
+generated/*.json
+!generated/.gitkeep

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BPG Node Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "type",
+    "package",
+    "source",
+    "capabilities",
+    "nodes",
+    "compatibility",
+    "observability",
+    "trust"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^bpg\\.[a-z0-9_.-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "const": "node_package"
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python", "install"],
+      "properties": {
+        "python": {"type": "string", "minLength": 1},
+        "install": {"type": "string", "minLength": 1}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo"],
+      "properties": {
+        "repo": {"type": "string", "format": "uri"}
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "uniqueItems": true
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "retryable", "idempotent", "side_effects"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "retryable": {"type": "boolean"},
+          "idempotent": {"type": "boolean"},
+          "side_effects": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "secrets": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bpg"],
+      "properties": {
+        "bpg": {"type": "string", "minLength": 1}
+      }
+    },
+    "observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["traces", "metrics"],
+      "properties": {
+        "traces": {"type": "boolean"},
+        "metrics": {"type": "boolean"}
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["community", "verified", "blessed", "deprecated"]
+        }
+      }
+    }
+  }
+}

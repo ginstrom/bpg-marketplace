@@ -1,0 +1,22 @@
+{
+  "id": "bpg.templates.enterprise_rag",
+  "name": "Enterprise RAG Pipeline",
+  "type": "template",
+  "summary": "Reference RAG workflow with retrieval, approval, and observability hooks.",
+  "capabilities": [
+    "vector_search",
+    "human_approval",
+    "audit_logging",
+    "trace_emission"
+  ],
+  "references": {
+    "example_path": "examples/rag/README.md",
+    "required_nodes": ["bpg.nodes.weaviate"]
+  },
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "trust": {
+    "level": "blessed"
+  }
+}
