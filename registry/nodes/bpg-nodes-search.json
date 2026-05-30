@@ -1,0 +1,60 @@
+{
+  "capabilities": [
+    "embedding",
+    "vector_search",
+    "hybrid_search",
+    "vector_upsert"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "id": "bpg.nodes.search",
+  "name": "BPG Search Nodes",
+  "nodes": [
+    {
+      "id": "embed.text",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "weaviate.hybrid_search",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": [
+        "fs_read"
+      ]
+    },
+    {
+      "id": "weaviate.upsert",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": [
+        "fs_write"
+      ]
+    },
+    {
+      "id": "web_search",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    }
+  ],
+  "observability": {
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-search",
+    "python": "bpg-nodes-search"
+  },
+  "source": {
+    "repo": "https://github.com/ginstrom/bpg"
+  },
+  "trust": {
+    "level": "blessed"
+  },
+  "type": "node_package"
+}

@@ -1,0 +1,40 @@
+{
+  "capabilities": [
+    "agent",
+    "human_in_the_loop"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "id": "bpg.nodes.human",
+  "name": "BPG Human Nodes",
+  "nodes": [
+    {
+      "id": "agent.pipeline",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "dashboard.form",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    }
+  ],
+  "observability": {
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-human",
+    "python": "bpg-nodes-human"
+  },
+  "source": {
+    "repo": "https://github.com/ginstrom/bpg"
+  },
+  "trust": {
+    "level": "blessed"
+  },
+  "type": "node_package"
+}

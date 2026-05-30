@@ -1,0 +1,110 @@
+{
+  "capabilities": [
+    "data_io",
+    "file_io",
+    "control_flow",
+    "math",
+    "orchestration",
+    "text_processing"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "id": "bpg.nodes.core",
+  "name": "BPG Core Nodes",
+  "nodes": [
+    {
+      "id": "csv.read",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": [
+        "fs_read"
+      ]
+    },
+    {
+      "id": "dataset.select_rows",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "flow.await_all",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "flow.fanout",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "flow.loop",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "fs.markdown_list",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": [
+        "fs_read"
+      ]
+    },
+    {
+      "id": "math.sum_numbers",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "passthrough",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "process_call",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "text.markdown_chunk",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "text.parse_numbers",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    },
+    {
+      "id": "timer.delay",
+      "idempotent": true,
+      "retryable": true,
+      "side_effects": []
+    }
+  ],
+  "observability": {
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-core",
+    "python": "bpg-nodes-core"
+  },
+  "source": {
+    "repo": "https://github.com/ginstrom/bpg"
+  },
+  "trust": {
+    "level": "blessed"
+  },
+  "type": "node_package"
+}

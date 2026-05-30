@@ -1,0 +1,72 @@
+{
+  "capabilities": [
+    "integration",
+    "http",
+    "email",
+    "queue",
+    "human_in_the_loop",
+    "slack"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "id": "bpg.nodes.comm",
+  "name": "BPG Communication Nodes",
+  "nodes": [
+    {
+      "id": "http.gitlab",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "http.webhook",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "notify.email",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "queue.kafka",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "slack.interactive",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    }
+  ],
+  "observability": {
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-comm",
+    "python": "bpg-nodes-comm"
+  },
+  "source": {
+    "repo": "https://github.com/ginstrom/bpg"
+  },
+  "trust": {
+    "level": "blessed"
+  },
+  "type": "node_package"
+}

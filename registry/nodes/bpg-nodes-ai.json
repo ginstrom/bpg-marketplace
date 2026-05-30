@@ -1,0 +1,67 @@
+{
+  "capabilities": [
+    "llm"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "id": "bpg.nodes.ai",
+  "name": "BPG AI Nodes",
+  "nodes": [
+    {
+      "id": "anthropic",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "google",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "llm",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "ollama",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    },
+    {
+      "id": "openai",
+      "idempotent": false,
+      "retryable": true,
+      "side_effects": [
+        "network_io"
+      ]
+    }
+  ],
+  "observability": {
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-ai",
+    "python": "bpg-nodes-ai"
+  },
+  "source": {
+    "repo": "https://github.com/ginstrom/bpg"
+  },
+  "trust": {
+    "level": "blessed"
+  },
+  "type": "node_package"
+}
