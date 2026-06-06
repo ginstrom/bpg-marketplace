@@ -68,20 +68,139 @@ def _validate_node_package(payload: dict) -> list[str]:
     errors = _validate_common(payload, "node_package")
     errors.extend(_validate_capabilities(payload))
     package = payload.get("package")
-    if not isinstance(package, dict) or not package.get("python") or not package.get("install"):
-        errors.append("package.python and package.install are required")
+    if (
+        not isinstance(package, dict)
+        or not package.get("python")
+        or not package.get("install")
+        or not package.get("version")
+    ):
+        errors.append("package.python, package.install, and package.version are required")
     source = payload.get("source")
     if not isinstance(source, dict) or not source.get("repo"):
         errors.append("source.repo is required")
+    if "worker" in payload:
+        errors.extend(_validate_worker(payload["worker"], "worker"))
+    if "dependencies" in payload and not isinstance(payload["dependencies"], dict):
+        errors.append("dependencies must be an object")
     nodes = payload.get("nodes")
     if not isinstance(nodes, list) or not nodes:
         errors.append("nodes must be a non-empty array")
+    else:
+        node_ids: set[str] = set()
+        package_capabilities = set(payload.get("capabilities", []))
+        for index, node in enumerate(nodes):
+            prefix = f"nodes[{index}]"
+            if not isinstance(node, dict):
+                errors.append(f"{prefix} must be an object")
+                continue
+            node_id = node.get("id")
+            if not isinstance(node_id, str) or not node_id.strip():
+                errors.append(f"{prefix}.id must be a non-empty string")
+            elif node_id in node_ids:
+                errors.append(f"{prefix}.id '{node_id}' is duplicated in package")
+            else:
+                node_ids.add(node_id)
+            if not isinstance(node.get("version"), str) or not node.get("version", "").strip():
+                errors.append(f"{prefix}.version must be a non-empty string")
+            capabilities = node.get("capabilities")
+            if not isinstance(capabilities, list) or not capabilities:
+                errors.append(f"{prefix}.capabilities must be a non-empty array")
+            elif not all(isinstance(item, str) and item for item in capabilities):
+                errors.append(f"{prefix}.capabilities entries must be non-empty strings")
+            elif package_capabilities and not set(capabilities).issubset(package_capabilities):
+                errors.append(f"{prefix}.capabilities must be declared by the package")
+            errors.extend(_validate_runtime(node.get("runtime"), prefix))
+            errors.extend(_validate_io(node.get("io"), prefix))
+            if not isinstance(node.get("retryable"), bool):
+                errors.append(f"{prefix}.retryable must be a boolean")
+            if not isinstance(node.get("idempotent"), bool):
+                errors.append(f"{prefix}.idempotent must be a boolean")
+            if not isinstance(node.get("side_effects"), list):
+                errors.append(f"{prefix}.side_effects must be an array")
+            errors.extend(_validate_execution(node.get("execution"), prefix))
+            if "worker" in node:
+                errors.extend(_validate_worker(node["worker"], f"{prefix}.worker"))
     observability = payload.get("observability")
     if not isinstance(observability, dict) or not {
         "traces",
         "metrics",
     }.issubset(observability):
         errors.append("observability.traces and observability.metrics are required")
+    return errors
+
+
+def _validate_worker(worker: object, prefix: str) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(worker, dict):
+        return [f"{prefix} must be an object"]
+    if not isinstance(worker.get("image"), str) or not worker.get("image", "").strip():
+        errors.append(f"{prefix}.image must be a non-empty string")
+    if worker.get("install_mode") not in {"package", "container", "external"}:
+        errors.append(f"{prefix}.install_mode must be one of package, container, external")
+    if "task_queue" in worker and (
+        not isinstance(worker["task_queue"], str) or not worker["task_queue"].strip()
+    ):
+        errors.append(f"{prefix}.task_queue must be a non-empty string")
+    return errors
+
+
+def _validate_runtime(runtime: object, prefix: str) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(runtime, dict):
+        return [f"{prefix}.runtime must be an object"]
+    runtime_type = runtime.get("type")
+    if runtime_type not in {"temporal_activity", "service_container", "external_service"}:
+        errors.append(
+            f"{prefix}.runtime.type must be one of temporal_activity, service_container, external_service"
+        )
+        return errors
+    if runtime_type == "temporal_activity":
+        for key in ["language", "entrypoint"]:
+            if not isinstance(runtime.get(key), str) or not runtime.get(key, "").strip():
+                errors.append(f"{prefix}.runtime.{key} is required for temporal_activity")
+    if runtime_type == "service_container" and (
+        not isinstance(runtime.get("image"), str) or not runtime.get("image", "").strip()
+    ):
+        errors.append(f"{prefix}.runtime.image is required for service_container")
+    for key in ["language", "entrypoint", "task_queue", "image"]:
+        if key in runtime and (not isinstance(runtime[key], str) or not runtime[key].strip()):
+            errors.append(f"{prefix}.runtime.{key} must be a non-empty string")
+    return errors
+
+
+def _validate_io(io: object, prefix: str) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(io, dict):
+        return [f"{prefix}.io must be an object"]
+    for key in ["input_schema", "output_schema"]:
+        if not isinstance(io.get(key), str) or not io.get(key, "").strip():
+            errors.append(f"{prefix}.io.{key} must be a non-empty string")
+    return errors
+
+
+def _validate_execution(execution: object, prefix: str) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(execution, dict):
+        return [f"{prefix}.execution must be an object"]
+    if not isinstance(execution.get("requires_network"), bool):
+        errors.append(f"{prefix}.execution.requires_network must be a boolean")
+    resources = execution.get("resources")
+    if not isinstance(resources, dict):
+        errors.append(f"{prefix}.execution.resources must be an object")
+    else:
+        for key in ["cpu", "memory"]:
+            if not isinstance(resources.get(key), str) or not resources.get(key, "").strip():
+                errors.append(f"{prefix}.execution.resources.{key} must be a non-empty string")
+        if "timeout_seconds" in resources and (
+            not isinstance(resources["timeout_seconds"], int) or resources["timeout_seconds"] < 1
+        ):
+            errors.append(f"{prefix}.execution.resources.timeout_seconds must be a positive integer")
+    for key in ["required_secrets", "required_services"]:
+        value = execution.get(key)
+        if not isinstance(value, list):
+            errors.append(f"{prefix}.execution.{key} must be an array")
+        elif not all(isinstance(item, str) and item for item in value):
+            errors.append(f"{prefix}.execution.{key} entries must be non-empty strings")
     return errors
 
 

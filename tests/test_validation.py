@@ -46,3 +46,37 @@ class ValidationTests(unittest.TestCase):
                     for issue in issues
                 )
             )
+
+    def test_registry_validation_rejects_temporal_activity_without_entrypoint(self):
+        with isolated_repo() as repo:
+            node_path = repo / "registry" / "nodes" / "bpg-nodes-search.json"
+            payload = json.loads(node_path.read_text(encoding="utf-8"))
+            del payload["nodes"][0]["runtime"]["entrypoint"]
+            node_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "node_package"
+                    and "runtime.entrypoint is required for temporal_activity" in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_service_container_without_image(self):
+        with isolated_repo() as repo:
+            node_path = repo / "registry" / "nodes" / "weaviate.json"
+            payload = json.loads(node_path.read_text(encoding="utf-8"))
+            del payload["nodes"][0]["runtime"]["image"]
+            node_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "node_package"
+                    and "runtime.image is required for service_container" in issue.message
+                    for issue in issues
+                )
+            )

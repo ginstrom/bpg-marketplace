@@ -6,20 +6,78 @@
   "compatibility": {
     "bpg": ">=0.1.0"
   },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-human",
+        "version": "0.1.0"
+      }
+    ]
+  },
   "id": "bpg.nodes.human",
   "name": "BPG Human Nodes",
   "nodes": [
     {
+      "capabilities": [
+        "agent"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "agent.pipeline",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/agent.pipeline.input.schema.json",
+        "output_schema": "schemas/nodes/agent.pipeline.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_human.activities.agent_pipeline",
+        "image": "ghcr.io/ginstrom/bpg-nodes-human-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-human",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "human_in_the_loop"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "dashboard.form",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/dashboard.form.input.schema.json",
+        "output_schema": "schemas/nodes/dashboard.form.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_human.activities.dashboard_form",
+        "image": "ghcr.io/ginstrom/bpg-nodes-human-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-human",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     }
   ],
   "observability": {
@@ -28,13 +86,25 @@
   },
   "package": {
     "install": "uv add bpg-nodes-human",
-    "python": "bpg-nodes-human"
+    "python": "bpg-nodes-human",
+    "version": "0.1.0"
   },
   "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/ginstrom/bpg"
+      }
+    ],
     "repo": "https://github.com/ginstrom/bpg"
   },
   "trust": {
     "level": "blessed"
   },
-  "type": "node_package"
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-human-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-human"
+  }
 }

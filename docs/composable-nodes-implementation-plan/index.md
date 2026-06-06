@@ -7,7 +7,7 @@ Each step is intended to be small enough to hand to an engineer. Complete the ch
 ## Steps
 
 - [x] [Step 1: Add Recipe Registry Support](step-01-recipe-registry.md)
-- [ ] [Step 2: Extend Node Metadata Schema](step-02-node-metadata-schema.md)
+- [x] [Step 2: Extend Node Metadata Schema](step-02-node-metadata-schema.md)
 - [ ] [Step 3: Add Sample Atomic Search Nodes](step-03-sample-search-nodes.md)
 - [ ] [Step 4: Add Japanese Hybrid Indexing Recipe](step-04-japanese-hybrid-indexing-recipe.md)
 - [ ] [Step 5: Index Recipes and Resolution Metadata](step-05-index-recipes-and-resolution-metadata.md)

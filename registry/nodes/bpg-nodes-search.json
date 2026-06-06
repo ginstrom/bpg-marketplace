@@ -8,38 +8,147 @@
   "compatibility": {
     "bpg": ">=0.1.0"
   },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-search",
+        "version": "0.1.0"
+      }
+    ]
+  },
   "id": "bpg.nodes.search",
   "name": "BPG Search Nodes",
   "nodes": [
     {
+      "capabilities": [
+        "embedding"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "embed.text",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/embed.text.input.schema.json",
+        "output_schema": "schemas/nodes/embed.text.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.embed_text",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "hybrid_search",
+        "vector_search"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "weaviate.hybrid_search",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/weaviate.hybrid_search.input.schema.json",
+        "output_schema": "schemas/nodes/weaviate.hybrid_search.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.weaviate_hybrid_search",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "fs_read"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "vector_upsert"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "weaviate.upsert",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/weaviate.upsert.input.schema.json",
+        "output_schema": "schemas/nodes/weaviate.upsert.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.weaviate_upsert",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "fs_write"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "vector_search"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "web_search",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/web_search.input.schema.json",
+        "output_schema": "schemas/nodes/web_search.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.web_search",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     }
   ],
   "observability": {
@@ -48,13 +157,25 @@
   },
   "package": {
     "install": "uv add bpg-nodes-search",
-    "python": "bpg-nodes-search"
+    "python": "bpg-nodes-search",
+    "version": "0.1.0"
   },
   "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/ginstrom/bpg"
+      }
+    ],
     "repo": "https://github.com/ginstrom/bpg"
   },
   "trust": {
     "level": "blessed"
   },
-  "type": "node_package"
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-search"
+  }
 }

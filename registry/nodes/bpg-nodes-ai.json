@@ -5,48 +5,181 @@
   "compatibility": {
     "bpg": ">=0.1.0"
   },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-ai",
+        "version": "0.1.0"
+      }
+    ]
+  },
   "id": "bpg.nodes.ai",
   "name": "BPG AI Nodes",
   "nodes": [
     {
+      "capabilities": [
+        "llm"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "anthropic",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/anthropic.input.schema.json",
+        "output_schema": "schemas/nodes/anthropic.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_ai.activities.anthropic",
+        "image": "ghcr.io/ginstrom/bpg-nodes-ai-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-ai",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "llm"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "google",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/google.input.schema.json",
+        "output_schema": "schemas/nodes/google.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_ai.activities.google",
+        "image": "ghcr.io/ginstrom/bpg-nodes-ai-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-ai",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "llm"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "llm",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/llm.input.schema.json",
+        "output_schema": "schemas/nodes/llm.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_ai.activities.llm",
+        "image": "ghcr.io/ginstrom/bpg-nodes-ai-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-ai",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "llm"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "ollama",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/ollama.input.schema.json",
+        "output_schema": "schemas/nodes/ollama.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_ai.activities.ollama",
+        "image": "ghcr.io/ginstrom/bpg-nodes-ai-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-ai",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "llm"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "openai",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/openai.input.schema.json",
+        "output_schema": "schemas/nodes/openai.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_ai.activities.openai",
+        "image": "ghcr.io/ginstrom/bpg-nodes-ai-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-ai",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     }
   ],
   "observability": {
@@ -55,13 +188,25 @@
   },
   "package": {
     "install": "uv add bpg-nodes-ai",
-    "python": "bpg-nodes-ai"
+    "python": "bpg-nodes-ai",
+    "version": "0.1.0"
   },
   "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/ginstrom/bpg"
+      }
+    ],
     "repo": "https://github.com/ginstrom/bpg"
   },
   "trust": {
     "level": "blessed"
   },
-  "type": "node_package"
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-ai-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-ai"
+  }
 }
