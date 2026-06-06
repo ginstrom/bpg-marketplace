@@ -16,6 +16,7 @@ class ValidationIssue:
 def load_schema(artifact_type: str, root: Path | None = None) -> dict:
     filename = {
         "node_package": "node.schema.json",
+        "recipe": "recipe.schema.json",
         "template": "template.schema.json",
         "pack": "pack.schema.json",
         "policy": "policy.schema.json",
@@ -122,9 +123,87 @@ def _validate_policy(payload: dict) -> list[str]:
     return errors
 
 
+def _validate_recipe(payload: dict) -> list[str]:
+    errors: list[str] = []
+    missing = _require_fields(
+        payload,
+        [
+            "id",
+            "type",
+            "name",
+            "summary",
+            "version",
+            "capabilities",
+            "inputs",
+            "outputs",
+            "steps",
+            "defaults",
+            "failure_policy",
+            "tradeoffs",
+        ],
+    )
+    if missing:
+        errors.append(f"missing required field(s): {', '.join(missing)}")
+        return errors
+
+    if payload["type"] != "recipe":
+        errors.append("type must be 'recipe'")
+    if not isinstance(payload["id"], str) or not payload["id"].startswith("bpg."):
+        errors.append("id must be a string starting with 'bpg.'")
+    if not isinstance(payload["name"], str) or not payload["name"].strip():
+        errors.append("name must be a non-empty string")
+    if not isinstance(payload["summary"], str) or not payload["summary"].strip():
+        errors.append("summary is required")
+    if not isinstance(payload["version"], str) or not payload["version"].strip():
+        errors.append("version must be a non-empty string")
+    errors.extend(_validate_capabilities(payload))
+
+    if not isinstance(payload.get("inputs"), dict):
+        errors.append("inputs must be an object")
+    if not isinstance(payload.get("outputs"), dict):
+        errors.append("outputs must be an object")
+    if not isinstance(payload.get("defaults"), dict):
+        errors.append("defaults must be an object")
+    if not isinstance(payload.get("failure_policy"), dict):
+        errors.append("failure_policy must be an object")
+    if not isinstance(payload.get("tradeoffs"), list):
+        errors.append("tradeoffs must be an array")
+
+    steps = payload.get("steps")
+    if not isinstance(steps, list) or not steps:
+        errors.append("steps must be a non-empty array")
+        return errors
+
+    for index, step in enumerate(steps):
+        prefix = f"steps[{index}]"
+        if not isinstance(step, dict):
+            errors.append(f"{prefix} must be an object")
+            continue
+        if not isinstance(step.get("id"), str) or not step.get("id", "").strip():
+            errors.append(f"{prefix}.id must be a non-empty string")
+        select = step.get("select")
+        if not isinstance(select, dict):
+            errors.append(f"{prefix}.select must be an object")
+            continue
+        has_capability = "capability" in select
+        has_node = "node" in select
+        if has_capability == has_node:
+            errors.append(f"{prefix}.select must specify exactly one of capability or node")
+        for key in ["capability", "node", "preferred_node", "version"]:
+            if key in select and (not isinstance(select[key], str) or not select[key].strip()):
+                errors.append(f"{prefix}.select.{key} must be a non-empty string")
+        if "with" in step and not isinstance(step["with"], dict):
+            errors.append(f"{prefix}.with must be an object")
+        if "optional" in step and not isinstance(step["optional"], bool):
+            errors.append(f"{prefix}.optional must be a boolean")
+
+    return errors
+
+
 def validate_artifact(artifact_type: str, payload: dict) -> list[str]:
     validators = {
         "node_package": _validate_node_package,
+        "recipe": _validate_recipe,
         "template": _validate_template,
         "pack": _validate_pack,
         "policy": _validate_policy,

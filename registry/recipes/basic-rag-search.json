@@ -1,0 +1,42 @@
+{
+  "id": "bpg.recipes.basic_rag_search",
+  "type": "recipe",
+  "name": "Basic RAG Search",
+  "summary": "Minimal composable search recipe for retrieval-backed generation.",
+  "version": "0.1.0",
+  "capabilities": [
+    "vector_search"
+  ],
+  "inputs": {
+    "query": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "results": {
+      "type": "array"
+    }
+  },
+  "steps": [
+    {
+      "id": "retrieve",
+      "select": {
+        "capability": "vector_search",
+        "preferred_node": "bpg.nodes.weaviate",
+        "version": ">=0.1.0"
+      },
+      "with": {
+        "query": "$inputs.query"
+      }
+    }
+  ],
+  "defaults": {
+    "top_k": 10
+  },
+  "failure_policy": {
+    "on_step_failure": "fail"
+  },
+  "tradeoffs": [
+    "Keeps the first recipe intentionally narrow; hybrid retrieval and tokenization are added in later implementation steps."
+  ]
+}

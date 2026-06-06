@@ -18,6 +18,7 @@ from .registry import (
 def build_indexes(root: Path | None = None) -> dict[str, Any]:
     artifacts: list[dict[str, Any]] = []
     capabilities: dict[str, list[dict[str, str]]] = defaultdict(list)
+    recipes: list[dict[str, Any]] = []
     templates: list[dict[str, Any]] = []
     compatibility: list[dict[str, Any]] = []
 
@@ -37,6 +38,8 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
 
         if artifact_type == "template":
             templates.append(payload)
+        if artifact_type == "recipe":
+            recipes.append(payload)
 
         compatibility.append(
             {
@@ -48,6 +51,7 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
         )
 
     artifacts.sort(key=lambda item: item["id"])
+    recipes.sort(key=lambda item: item["id"])
     templates.sort(key=lambda item: item["id"])
     normalized_capabilities = {
         key: sorted(values, key=lambda item: item["id"])
@@ -57,6 +61,7 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
     result = {
         "index": {"artifacts": artifacts},
         "capabilities": normalized_capabilities,
+        "recipes": {"recipes": recipes},
         "templates": {"templates": templates},
         "compatibility": {"artifacts": sorted(compatibility, key=lambda item: item["id"])},
         "manifest": {
@@ -68,6 +73,8 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
                     "primary_index": (
                         "generated/templates.json"
                         if artifact_type == "template"
+                        else "generated/recipes.json"
+                        if artifact_type == "recipe"
                         else "generated/capabilities.json"
                         if artifact_type == "node_package"
                         else "generated/index.json"
@@ -79,6 +86,7 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
                 "manifest": "generated/manifest.json",
                 "index": "generated/index.json",
                 "capabilities": "generated/capabilities.json",
+                "recipes": "generated/recipes.json",
                 "templates": "generated/templates.json",
                 "compatibility": "generated/compatibility.json",
             },
@@ -88,6 +96,7 @@ def build_indexes(root: Path | None = None) -> dict[str, Any]:
     output_root = generated_root(root)
     write_json(output_root / "index.json", result["index"])
     write_json(output_root / "capabilities.json", result["capabilities"])
+    write_json(output_root / "recipes.json", result["recipes"])
     write_json(output_root / "templates.json", result["templates"])
     write_json(output_root / "compatibility.json", result["compatibility"])
     write_json(output_root / "manifest.json", result["manifest"])

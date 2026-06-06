@@ -1,6 +1,6 @@
 # bpg-marketplace
 
-`bpg-marketplace` is a GitHub-native registry for reusable BPG workflow components, templates, packs, and policies.
+`bpg-marketplace` is a GitHub-native registry for reusable BPG workflow components, recipes, templates, packs, and policies.
 
 This repository is structured around machine-readable metadata rather than a visual application. The current scaffold includes:
 
@@ -31,6 +31,7 @@ The generated indexes remain:
 
 * `generated/index.json` for the full artifact catalog
 * `generated/capabilities.json` for capability-first lookup
+* `generated/recipes.json` for recipe-only lookup
 * `generated/templates.json` for template-only lookup
 * `generated/compatibility.json` for compatibility and trust metadata
 

@@ -26,3 +26,23 @@ class ValidationTests(unittest.TestCase):
             issues = validate_registry(repo)
 
             self.assertTrue(any("duplicate artifact id" in issue.message for issue in issues))
+
+    def test_registry_validation_rejects_invalid_recipe(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "invalid.json"
+            payload = json.loads((repo / "registry" / "recipes" / "basic-rag-search.json").read_text(encoding="utf-8"))
+            payload["steps"][0]["select"] = {
+                "capability": "vector_search",
+                "node": "bpg.nodes.weaviate",
+            }
+            recipe_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "select must specify exactly one of capability or node" in issue.message
+                    for issue in issues
+                )
+            )
