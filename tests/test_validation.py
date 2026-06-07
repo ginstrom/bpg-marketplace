@@ -9,7 +9,7 @@ from jsonschema.validators import Draft202012Validator
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from bpg_marketplace.validation import validate_registry
+from bpg_marketplace.validation import _version_matches, validate_registry
 
 from tests.helpers import isolated_repo
 
@@ -342,6 +342,51 @@ class ValidationTests(unittest.TestCase):
                     for issue in issues
                 )
             )
+
+    def test_version_matches_compound_constraints(self):
+        self.assertTrue(_version_matches("1.2.0", ">=1.2,<2.0"))
+        self.assertTrue(_version_matches("1.9.9", ">=1.2,<2.0"))
+        self.assertFalse(_version_matches("2.0.0", ">=1.2,<2.0"))
+        self.assertFalse(_version_matches("1.1.0", ">=1.2,<2.0"))
+
+    def test_version_matches_single_operator_constraints(self):
+        self.assertTrue(_version_matches("0.1.0", ">=0.1.0"))
+        self.assertFalse(_version_matches("0.0.9", ">=0.1.0"))
+        self.assertTrue(_version_matches("1.0.0", "<2.0"))
+        self.assertTrue(_version_matches("1.0.0", "==1.0.0"))
+
+    def test_version_matches_exact_string_when_unparseable(self):
+        self.assertTrue(_version_matches("custom-build", "custom-build"))
+        self.assertFalse(_version_matches("custom-build", "other-build"))
+
+    def test_registry_validation_rejects_malformed_version_constraint(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "basic-rag-search.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][0]["select"]["version"] = ">=1.2,<2.0,invalid"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].select.version version constraint must use comma-separated clauses"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_accepts_compound_version_constraint(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][0]["select"]["version"] = ">=0.1.0,<1.0.0"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertEqual([], issues)
 
     def test_registry_validation_rejects_incompatible_projection_transform(self):
         with isolated_repo() as repo:

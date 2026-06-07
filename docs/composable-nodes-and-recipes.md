@@ -189,6 +189,13 @@ Breaking changes to node input/output contracts should require a major version c
 
 Node package metadata should publish concrete node versions. Recipe metadata should use version constraints. Generated execution plans should pin exact resolved versions.
 
+Supported version constraint grammar:
+
+- Single clause: `>=1.0`, `<=2.0`, `>1.0`, `<2.0`, `==1.0`, or `=1.0`
+- Compound ranges: comma-separated AND clauses, for example `>=1.2,<2.0`
+- Whitespace around commas and operators is tolerated
+- Pre-release suffixes on versions (for example `1.2.0-beta`) compare on the numeric prefix
+
 ### Service Nodes
 
 Some marketplace entries represent service dependencies rather than custom workflow code.

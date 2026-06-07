@@ -324,6 +324,10 @@ def _validate_recipe(payload: dict) -> list[str]:
         for key in ["capability", "node", "preferred_node", "version"]:
             if key in select and (not isinstance(select[key], str) or not select[key].strip()):
                 errors.append(f"{prefix}.select.{key} must be a non-empty string")
+        if isinstance(select.get("version"), str):
+            version_error = _validate_version_constraint(select["version"])
+            if version_error:
+                errors.append(f"{prefix}.select.version {version_error}")
         if "with" in step:
             if not isinstance(step["with"], dict):
                 errors.append(f"{prefix}.with must be an object")
@@ -396,6 +400,11 @@ def _validate_recipe_mapping_transform(prefix: str, transform: object) -> list[s
     return errors
 
 
+_VERSION_CLAUSE_RE = re.compile(
+    r"^(>=|<=|>|<|==|=)?\s*v?(\d+(?:\.\d+){0,2})(?:[-+].*)?$"
+)
+
+
 def _parse_version(version: str) -> tuple[int, ...] | None:
     match = re.match(r"^v?(\d+(?:\.\d+){0,2})(?:[-+].*)?$", version)
     if not match:
@@ -404,18 +413,14 @@ def _parse_version(version: str) -> tuple[int, ...] | None:
     return parts + (0,) * (3 - len(parts))
 
 
-def _version_matches(version: str, constraint: str | None) -> bool:
-    if not constraint:
-        return True
-    version_parts = _parse_version(version)
-    constraint = constraint.strip()
-    match = re.match(r"^(>=|<=|>|<|==|=)?\s*v?(\d+(?:\.\d+){0,2})(?:[-+].*)?$", constraint)
-    if not match or version_parts is None:
-        return version == constraint
+def _version_clause_matches(version_parts: tuple[int, ...], clause: str) -> bool:
+    match = _VERSION_CLAUSE_RE.match(clause.strip())
+    if not match:
+        return False
     operator = match.group(1) or "=="
     expected_parts = _parse_version(match.group(2))
     if expected_parts is None:
-        return version == constraint
+        return False
     if operator in {"=", "=="}:
         return version_parts == expected_parts
     if operator == ">=":
@@ -427,6 +432,40 @@ def _version_matches(version: str, constraint: str | None) -> bool:
     if operator == "<":
         return version_parts < expected_parts
     return False
+
+
+def _validate_version_constraint(constraint: str) -> str | None:
+    """Return an error message when a version constraint uses unsupported syntax."""
+    stripped = constraint.strip()
+    if not stripped:
+        return None
+    clauses = [part.strip() for part in stripped.split(",") if part.strip()]
+    if not clauses:
+        return None
+    for clause in clauses:
+        if not _VERSION_CLAUSE_RE.match(clause):
+            return (
+                "version constraint must use comma-separated clauses with operators "
+                ">=, <=, >, <, ==, or ="
+            )
+    return None
+
+
+def _version_matches(version: str, constraint: str | None) -> bool:
+    if not constraint:
+        return True
+    version_parts = _parse_version(version)
+    constraint = constraint.strip()
+    if not constraint:
+        return True
+    clauses = [part.strip() for part in constraint.split(",") if part.strip()]
+    if not clauses:
+        return True
+    if version_parts is None:
+        return version == constraint
+    if len(clauses) == 1 and not _VERSION_CLAUSE_RE.match(clauses[0]):
+        return version == constraint
+    return all(_version_clause_matches(version_parts, clause) for clause in clauses)
 
 
 def _build_node_catalog(
