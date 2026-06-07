@@ -785,7 +785,10 @@ def _validate_registry_references(
     service_nodes = {
         node_id
         for node_id, records in by_id.items()
-        if any(record.node.get("runtime", {}).get("type") == "service_container" for record in records)
+        if any(
+            record.node.get("runtime", {}).get("type") in {"service_container", "external_service"}
+            for record in records
+        )
     }
 
     for artifact_type, path, recipe in artifacts:
@@ -822,7 +825,7 @@ def _validate_registry_references(
                         ValidationIssue(
                             "recipe",
                             str(path),
-                            f"steps[{step_index}].execution.required_services '{service}' does not resolve to a service_container node",
+                            f"steps[{step_index}].execution.required_services '{service}' does not resolve to a service or external_service node",
                         )
                     )
 

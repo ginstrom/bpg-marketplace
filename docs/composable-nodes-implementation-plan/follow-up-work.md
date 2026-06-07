@@ -16,7 +16,7 @@ Complete the checkboxes as work lands.
 | Tests and CI | Passing |
 | Registry validation and static verification | Passing |
 | Index generation | Passing |
-| Follow-up steps below | Open |
+| Follow-up steps below | Complete |
 
 ## Steps
 
@@ -30,7 +30,7 @@ Complete the checkboxes as work lands.
 
 - [x] [Follow-Up 4: Support Compound Version Constraints](follow-up-04-compound-version-constraints.md)
 - [x] [Follow-Up 5: Decide on Structured `preferred_node` References](follow-up-05-structured-preferred-node-references.md)
-- [ ] [Follow-Up 6: Add an `external_service` Registry Example](follow-up-06-external-service-registry-example.md) — defer until a real external dependency is ready
+- [x] [Follow-Up 6: Add an `external_service` Registry Example](follow-up-06-external-service-registry-example.md)
 
 ### Test Coverage
 

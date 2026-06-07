@@ -243,6 +243,13 @@ Production guidance:
 
 Service dependencies are marketplace nodes with `runtime.type: service_container` or `runtime.type: external_service`.
 
+| Runtime type | Use when | Example |
+| --- | --- | --- |
+| `service_container` | You run and manage the dependency (container image, connection contract) | `opensearch.service`, `weaviate.service` |
+| `external_service` | A third party hosts the API; you declare endpoint and auth requirements | `embedding.openai_api` |
+
+`service_container` nodes require a container `runtime.image`. `external_service` nodes declare connection metadata and secrets instead of shipping a worker image. Both appear in `execution.required_services` on dependent activity nodes.
+
 Executable nodes declare dependencies in `execution.required_services`:
 
 ```json

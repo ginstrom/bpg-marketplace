@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "api_base": {
+      "format": "uri",
+      "type": "string"
+    },
+    "api_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "organization_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "api_base"
+  ],
+  "title": "OpenAI Embeddings API Service Input",
+  "type": "object"
+}

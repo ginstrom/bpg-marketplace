@@ -217,6 +217,8 @@ Service nodes can be dependencies of executable nodes or recipes.
 
 Modeling services as nodes is preferable to introducing a separate artifact type at this stage. A service such as Weaviate or OpenSearch is still a marketplace-resolvable operational primitive with capabilities, versions, trust metadata, dependencies, and observability expectations. The distinction should live in `runtime.type`, for example `temporal_activity`, `service_container`, or `external_service`.
 
+Use `service_container` for dependencies you deploy and operate (for example OpenSearch). Use `external_service` for hosted APIs you connect to but do not run (for example `embedding.openai_api` for the OpenAI embeddings endpoint). See the registry example in `registry/nodes/bpg-nodes-search.json`.
+
 The tradeoff is that the term "node" becomes broader than "callable workflow step." That is acceptable if every recipe step declares whether it invokes an executable node or depends on a service node. This keeps dependency resolution unified while avoiding a separate service registry too early.
 
 ### Worker Packaging

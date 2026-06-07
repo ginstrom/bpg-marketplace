@@ -30,7 +30,7 @@ Remaining polish, documentation drift, and deferred enforcement from the impleme
 
 - [x] [Follow-Up 4: Compound Version Constraints](follow-up-04-compound-version-constraints.md)
 - [x] [Follow-Up 5: Structured `preferred_node` References](follow-up-05-structured-preferred-node-references.md)
-- [ ] [Follow-Up 6: `external_service` Registry Example](follow-up-06-external-service-registry-example.md)
+- [x] [Follow-Up 6: `external_service` Registry Example](follow-up-06-external-service-registry-example.md)
 
 ### Test Coverage and Verification
 

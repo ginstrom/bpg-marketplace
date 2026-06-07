@@ -16,6 +16,7 @@ from tests.helpers import isolated_repo
 
 SAMPLE_NODE_IDS = {
     "embedding.create_text_embedding": "temporal_activity",
+    "embedding.openai_api": "external_service",
     "tokenization.kuromoji_tokenize": "temporal_activity",
     "opensearch.hybrid_upsert": "temporal_activity",
     "opensearch.service": "service_container",

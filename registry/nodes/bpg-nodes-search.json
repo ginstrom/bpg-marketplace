@@ -25,9 +25,13 @@
         "embedding"
       ],
       "execution": {
-        "required_secrets": [],
-        "required_services": [],
-        "requires_network": false,
+        "required_secrets": [
+          "OPENAI_API_KEY"
+        ],
+        "required_services": [
+          "embedding.openai_api"
+        ],
+        "requires_network": true,
         "resources": {
           "cpu": "250m",
           "memory": "512Mi",
@@ -179,6 +183,42 @@
         "fs_write"
       ],
       "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "embedding"
+      ],
+      "execution": {
+        "required_secrets": [
+          "OPENAI_API_KEY"
+        ],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "0m",
+          "memory": "0Mi",
+          "timeout_seconds": 30
+        }
+      },
+      "id": "embedding.openai_api",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/services/embedding.openai_api.input.schema.json",
+        "output_schema": "schemas/services/embedding.openai_api.output.schema.json"
+      },
+      "retryable": false,
+      "runtime": {
+        "type": "external_service"
+      },
+      "side_effects": [
+        "network_io"
+      ],
+      "version": "0.1.0",
+      "worker": {
+        "image": "external/openai-embeddings-api:0.1.0",
+        "install_mode": "external",
+        "task_queue": "bpg-external"
+      }
     },
     {
       "capabilities": [
