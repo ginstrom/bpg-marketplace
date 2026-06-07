@@ -1,44 +1,169 @@
 {
-  "id": "bpg.nodes.weaviate",
-  "name": "Weaviate Nodes",
-  "type": "node_package",
-  "package": {
-    "python": "bpg-nodes-weaviate",
-    "install": "uv add bpg-nodes-weaviate"
-  },
-  "source": {
-    "repo": "https://github.com/example/bpg-nodes-weaviate"
-  },
   "capabilities": [
     "vector_search",
     "hybrid_search",
     "vector_upsert"
   ],
-  "nodes": [
-    {
-      "id": "weaviate.search",
-      "retryable": true,
-      "idempotent": true,
-      "side_effects": ["network_io"]
-    },
-    {
-      "id": "weaviate.upsert",
-      "retryable": true,
-      "idempotent": true,
-      "side_effects": ["network_io", "data_write"]
-    }
-  ],
-  "requirements": {
-    "secrets": ["WEAVIATE_API_KEY"]
-  },
   "compatibility": {
     "bpg": ">=0.1.0"
   },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-weaviate",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "id": "bpg.nodes.weaviate",
+  "name": "Weaviate Nodes",
+  "nodes": [
+    {
+      "capabilities": [
+        "vector_search",
+        "hybrid_search",
+        "vector_upsert"
+      ],
+      "execution": {
+        "required_secrets": [
+          "WEAVIATE_API_KEY"
+        ],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "1000m",
+          "memory": "2Gi",
+          "timeout_seconds": 300
+        }
+      },
+      "id": "weaviate.service",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/services/weaviate.input.schema.json",
+        "output_schema": "schemas/services/weaviate.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "image": "docker.io/semitechnologies/weaviate:1.25.7",
+        "type": "service_container"
+      },
+      "side_effects": [
+        "network_io",
+        "data_write"
+      ],
+      "version": "0.1.0",
+      "worker": {
+        "image": "docker.io/semitechnologies/weaviate:1.25.7",
+        "install_mode": "container",
+        "task_queue": "bpg-weaviate-service"
+      }
+    },
+    {
+      "capabilities": [
+        "vector_search"
+      ],
+      "execution": {
+        "required_secrets": [
+          "WEAVIATE_API_KEY"
+        ],
+        "required_services": [
+          "weaviate.service"
+        ],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "weaviate.search",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/weaviate.search.input.schema.json",
+        "output_schema": "schemas/nodes/weaviate.search.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_weaviate.activities.weaviate_search",
+        "image": "ghcr.io/ginstrom/bpg-nodes-weaviate-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-weaviate",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "network_io"
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "vector_upsert"
+      ],
+      "execution": {
+        "required_secrets": [
+          "WEAVIATE_API_KEY"
+        ],
+        "required_services": [
+          "weaviate.service"
+        ],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "weaviate.upsert",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/weaviate.upsert.input.schema.json",
+        "output_schema": "schemas/nodes/weaviate.upsert.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_weaviate.activities.weaviate_upsert",
+        "image": "ghcr.io/ginstrom/bpg-nodes-weaviate-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-weaviate",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "network_io",
+        "data_write"
+      ],
+      "version": "0.1.0"
+    }
+  ],
   "observability": {
-    "traces": true,
-    "metrics": true
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-weaviate",
+    "python": "bpg-nodes-weaviate",
+    "version": "0.1.0"
+  },
+  "requirements": {
+    "secrets": [
+      "WEAVIATE_API_KEY"
+    ]
+  },
+  "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/example/bpg-nodes-weaviate"
+      }
+    ],
+    "repo": "https://github.com/example/bpg-nodes-weaviate"
   },
   "trust": {
     "level": "verified"
+  },
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-weaviate-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-weaviate"
   }
 }

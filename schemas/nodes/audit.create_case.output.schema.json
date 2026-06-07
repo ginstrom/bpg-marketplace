@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {
+      "type": "string"
+    },
+    "case_system": {
+      "type": "string"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "labels": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "case_id",
+    "url",
+    "case_system",
+    "dry_run"
+  ],
+  "title": "Create Audit Case Output",
+  "type": "object"
+}

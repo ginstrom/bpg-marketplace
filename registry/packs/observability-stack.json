@@ -1,0 +1,23 @@
+{
+  "id": "bpg.packs.observability_stack",
+  "name": "Observability Stack Pack",
+  "type": "pack",
+  "summary": "Starter capability pack for post-run audit reporting and compliance workflows.",
+  "includes": [
+    "bpg.nodes.audit",
+    "bpg.recipes.post_run_audit_reporting"
+  ],
+  "capabilities": [
+    "audit_logging",
+    "audit_verification",
+    "compliance_reporting",
+    "evidence_export",
+    "trace_emission"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "trust": {
+    "level": "verified"
+  }
+}

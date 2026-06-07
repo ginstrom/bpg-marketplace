@@ -7,6 +7,7 @@ from typing import Any
 
 ARTIFACT_DIRS = {
     "node_package": "nodes",
+    "recipe": "recipes",
     "template": "templates",
     "pack": "packs",
     "policy": "policies",

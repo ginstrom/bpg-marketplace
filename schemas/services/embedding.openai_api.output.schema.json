@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "endpoint": {
+      "format": "uri",
+      "type": "string"
+    },
+    "provider": {
+      "const": "openai"
+    },
+    "service": {
+      "const": "embedding.openai_api"
+    }
+  },
+  "required": [
+    "service",
+    "provider",
+    "endpoint"
+  ],
+  "title": "OpenAI Embeddings API Service Output",
+  "type": "object"
+}

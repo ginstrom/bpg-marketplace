@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "dsn": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dsn_env": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "from_checkpoint": {
+      "type": "boolean"
+    },
+    "require_anchor": {
+      "type": "boolean"
+    },
+    "run_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id"
+  ],
+  "title": "Verify Audit Chain Input",
+  "type": "object"
+}

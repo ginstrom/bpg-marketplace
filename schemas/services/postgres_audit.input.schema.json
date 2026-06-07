@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "database": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dsn_env": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "host": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "port": {
+      "maximum": 65535,
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "host",
+    "port",
+    "database"
+  ],
+  "title": "Postgres Audit Service Input",
+  "type": "object"
+}

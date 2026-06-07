@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "channel": {
+      "type": "string"
+    },
+    "channel_type": {
+      "type": "string"
+    },
+    "delivery_ref": {
+      "type": "string"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "notified": {
+      "type": "boolean"
+    },
+    "run_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "notified",
+    "channel",
+    "channel_type",
+    "dry_run"
+  ],
+  "title": "Notify Compliance Channel Output",
+  "type": "object"
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "dimensions": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "model": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "text": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "text",
+    "model"
+  ],
+  "title": "Create Text Embedding Input",
+  "type": "object"
+}

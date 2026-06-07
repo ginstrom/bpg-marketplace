@@ -1,6 +1,7 @@
 {
   "capabilities": [
     "embedding",
+    "tokenization",
     "vector_search",
     "hybrid_search",
     "vector_upsert"
@@ -8,38 +9,249 @@
   "compatibility": {
     "bpg": ">=0.1.0"
   },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-search",
+        "version": "0.1.0"
+      }
+    ]
+  },
   "id": "bpg.nodes.search",
   "name": "BPG Search Nodes",
   "nodes": [
     {
+      "capabilities": [
+        "embedding"
+      ],
+      "execution": {
+        "required_secrets": [
+          "OPENAI_API_KEY"
+        ],
+        "required_services": [
+          "embedding.openai_api"
+        ],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "embedding.create_text_embedding",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/embedding.create_text_embedding.input.schema.json",
+        "output_schema": "schemas/nodes/embedding.create_text_embedding.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.create_text_embedding",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "embedding"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "embed.text",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/embed.text.input.schema.json",
+        "output_schema": "schemas/nodes/embed.text.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.embed_text",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "tokenization"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "500m",
+          "memory": "1Gi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "tokenization.kuromoji_tokenize",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/tokenization.kuromoji_tokenize.input.schema.json",
+        "output_schema": "schemas/nodes/tokenization.kuromoji_tokenize.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.kuromoji_tokenize",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "hybrid_search",
+        "vector_search"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "weaviate.hybrid_search",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/weaviate.hybrid_search.input.schema.json",
+        "output_schema": "schemas/nodes/weaviate.hybrid_search.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.weaviate_hybrid_search",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "fs_read"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "vector_upsert"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "weaviate.upsert",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/weaviate.upsert.input.schema.json",
+        "output_schema": "schemas/nodes/weaviate.upsert.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.weaviate_upsert",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "fs_write"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
-      "id": "web_search",
-      "idempotent": false,
-      "retryable": true,
+      "capabilities": [
+        "embedding"
+      ],
+      "execution": {
+        "required_secrets": [
+          "OPENAI_API_KEY"
+        ],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "0m",
+          "memory": "0Mi",
+          "timeout_seconds": 30
+        }
+      },
+      "id": "embedding.openai_api",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/services/embedding.openai_api.input.schema.json",
+        "output_schema": "schemas/services/embedding.openai_api.output.schema.json"
+      },
+      "retryable": false,
+      "runtime": {
+        "type": "external_service"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0",
+      "worker": {
+        "image": "external/openai-embeddings-api:0.1.0",
+        "install_mode": "external",
+        "task_queue": "bpg-external"
+      }
+    },
+    {
+      "capabilities": [
+        "vector_search"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "web_search",
+      "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/web_search.input.schema.json",
+        "output_schema": "schemas/nodes/web_search.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.web_search",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "network_io"
+      ],
+      "version": "0.1.0"
     }
   ],
   "observability": {
@@ -48,13 +260,25 @@
   },
   "package": {
     "install": "uv add bpg-nodes-search",
-    "python": "bpg-nodes-search"
+    "python": "bpg-nodes-search",
+    "version": "0.1.0"
   },
   "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/ginstrom/bpg"
+      }
+    ],
     "repo": "https://github.com/ginstrom/bpg"
   },
   "trust": {
     "level": "blessed"
   },
-  "type": "node_package"
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-search"
+  }
 }

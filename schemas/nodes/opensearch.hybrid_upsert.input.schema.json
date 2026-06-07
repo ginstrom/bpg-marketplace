@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "index": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "text": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tokens": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "vector": {
+      "items": {
+        "type": "number"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "index",
+    "id",
+    "text",
+    "tokens",
+    "vector",
+    "metadata"
+  ],
+  "title": "OpenSearch Hybrid Upsert Input",
+  "type": "object"
+}

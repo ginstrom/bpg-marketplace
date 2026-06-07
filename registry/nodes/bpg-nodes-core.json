@@ -10,86 +10,399 @@
   "compatibility": {
     "bpg": ">=0.1.0"
   },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-core",
+        "version": "0.1.0"
+      }
+    ]
+  },
   "id": "bpg.nodes.core",
   "name": "BPG Core Nodes",
   "nodes": [
     {
+      "capabilities": [
+        "data_io",
+        "file_io"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "csv.read",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/csv.read.input.schema.json",
+        "output_schema": "schemas/nodes/csv.read.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.csv_read",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "fs_read"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "data_io"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "dataset.select_rows",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/dataset.select_rows.input.schema.json",
+        "output_schema": "schemas/nodes/dataset.select_rows.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.dataset_select_rows",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "control_flow",
+        "orchestration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "flow.await_all",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/flow.await_all.input.schema.json",
+        "output_schema": "schemas/nodes/flow.await_all.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.flow_await_all",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "control_flow",
+        "orchestration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "flow.fanout",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/flow.fanout.input.schema.json",
+        "output_schema": "schemas/nodes/flow.fanout.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.flow_fanout",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "control_flow",
+        "orchestration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "flow.loop",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/flow.loop.input.schema.json",
+        "output_schema": "schemas/nodes/flow.loop.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.flow_loop",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "file_io",
+        "text_processing"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "fs.markdown_list",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/fs.markdown_list.input.schema.json",
+        "output_schema": "schemas/nodes/fs.markdown_list.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.fs_markdown_list",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "fs_read"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "math"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "math.sum_numbers",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/math.sum_numbers.input.schema.json",
+        "output_schema": "schemas/nodes/math.sum_numbers.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.math_sum_numbers",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "control_flow"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "passthrough",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/passthrough.input.schema.json",
+        "output_schema": "schemas/nodes/passthrough.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.passthrough",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "orchestration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "process_call",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/process_call.input.schema.json",
+        "output_schema": "schemas/nodes/process_call.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.process_call",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "text_processing"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "text.markdown_chunk",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/text.markdown_chunk.input.schema.json",
+        "output_schema": "schemas/nodes/text.markdown_chunk.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.text_markdown_chunk",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "text_processing"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "text.parse_numbers",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/text.parse_numbers.input.schema.json",
+        "output_schema": "schemas/nodes/text.parse_numbers.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.text_parse_numbers",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "control_flow"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "timer.delay",
       "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/timer.delay.input.schema.json",
+        "output_schema": "schemas/nodes/timer.delay.output.schema.json"
+      },
       "retryable": true,
-      "side_effects": []
+      "runtime": {
+        "entrypoint": "bpg_nodes_core.activities.timer_delay",
+        "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-core",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
     }
   ],
   "observability": {
@@ -98,13 +411,25 @@
   },
   "package": {
     "install": "uv add bpg-nodes-core",
-    "python": "bpg-nodes-core"
+    "python": "bpg-nodes-core",
+    "version": "0.1.0"
   },
   "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/ginstrom/bpg"
+      }
+    ],
     "repo": "https://github.com/ginstrom/bpg"
   },
   "trust": {
     "level": "blessed"
   },
-  "type": "node_package"
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-core-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-core"
+  }
 }

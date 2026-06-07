@@ -1,0 +1,73 @@
+{
+  "id": "bpg.recipes.post_run_audit_reporting",
+  "type": "recipe",
+  "name": "Post-Run Audit Reporting",
+  "summary": "Optional post-run workflow for exporting, verifying, and routing audit evidence after runtime capture completes.",
+  "version": "0.1.0",
+  "capabilities": [
+    "audit_logging",
+    "audit_verification",
+    "compliance_reporting",
+    "evidence_export"
+  ],
+  "inputs": {
+    "run_id": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "bundle": {
+      "type": "object"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "verification_valid": {
+      "type": "boolean"
+    }
+  },
+  "steps": [
+    {
+      "id": "verify",
+      "select": {
+        "node": "audit.verify_chain",
+        "version": ">=0.1.0"
+      },
+      "with": {
+        "run_id": "$inputs.run_id"
+      }
+    },
+    {
+      "id": "export",
+      "select": {
+        "node": "audit.export_bundle",
+        "version": ">=0.1.0"
+      },
+      "with": {
+        "run_id": "$inputs.run_id"
+      }
+    },
+    {
+      "id": "summarize",
+      "select": {
+        "node": "audit.write_compliance_summary",
+        "version": ">=0.1.0"
+      },
+      "with": {
+        "run_id": "$inputs.run_id",
+        "bundle": "$.steps.export.bundle",
+        "format": "markdown"
+      }
+    }
+  ],
+  "defaults": {
+    "format": "markdown"
+  },
+  "failure_policy": {
+    "on_step_failure": "fail"
+  },
+  "tradeoffs": [
+    "Helper nodes read from the runtime audit ledger and do not replace mandatory runtime capture.",
+    "Notification and case-management steps are intentionally omitted from the default recipe so teams can add them only when needed."
+  ]
+}

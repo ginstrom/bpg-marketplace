@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "event_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "format": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "summary": {},
+    "verification_valid": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "run_id",
+    "format",
+    "summary",
+    "event_count",
+    "verification_valid"
+  ],
+  "title": "Write Compliance Summary Output",
+  "type": "object"
+}

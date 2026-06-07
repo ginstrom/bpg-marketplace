@@ -1,0 +1,309 @@
+{
+  "capabilities": [
+    "audit_logging",
+    "audit_verification",
+    "compliance_reporting",
+    "evidence_export",
+    "integration",
+    "notification",
+    "trace_emission"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-audit",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "id": "bpg.nodes.audit",
+  "name": "BPG Audit Helper Nodes",
+  "nodes": [
+    {
+      "capabilities": [
+        "audit_logging"
+      ],
+      "execution": {
+        "required_secrets": [
+          "BPG_AUDIT_DATABASE_URL"
+        ],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "postgres_audit.service",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/services/postgres_audit.input.schema.json",
+        "output_schema": "schemas/services/postgres_audit.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "image": "docker.io/library/postgres:16",
+        "type": "service_container"
+      },
+      "side_effects": [
+        "data_write"
+      ],
+      "version": "0.1.0",
+      "worker": {
+        "image": "docker.io/library/postgres:16",
+        "install_mode": "container",
+        "task_queue": "bpg-audit-service"
+      }
+    },
+    {
+      "capabilities": [
+        "audit_logging",
+        "evidence_export"
+      ],
+      "execution": {
+        "required_secrets": [
+          "BPG_AUDIT_DATABASE_URL"
+        ],
+        "required_services": [
+          "postgres_audit.service"
+        ],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "audit.export_bundle",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/audit.export_bundle.input.schema.json",
+        "output_schema": "schemas/nodes/audit.export_bundle.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_audit.activities.export_audit_bundle",
+        "image": "ghcr.io/ginstrom/bpg-nodes-audit-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-audit",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "fs_read"
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "audit_logging",
+        "audit_verification"
+      ],
+      "execution": {
+        "required_secrets": [
+          "BPG_AUDIT_DATABASE_URL"
+        ],
+        "required_services": [
+          "postgres_audit.service"
+        ],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "audit.verify_chain",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/audit.verify_chain.input.schema.json",
+        "output_schema": "schemas/nodes/audit.verify_chain.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_audit.activities.verify_audit_chain",
+        "image": "ghcr.io/ginstrom/bpg-nodes-audit-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-audit",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "audit_logging",
+        "compliance_reporting"
+      ],
+      "execution": {
+        "required_secrets": [
+          "BPG_AUDIT_DATABASE_URL"
+        ],
+        "required_services": [
+          "postgres_audit.service"
+        ],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "audit.write_compliance_summary",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/audit.write_compliance_summary.input.schema.json",
+        "output_schema": "schemas/nodes/audit.write_compliance_summary.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_audit.activities.write_compliance_summary",
+        "image": "ghcr.io/ginstrom/bpg-nodes-audit-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-audit",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "audit_logging",
+        "compliance_reporting",
+        "notification"
+      ],
+      "execution": {
+        "required_secrets": [
+          "BPG_AUDIT_DATABASE_URL"
+        ],
+        "required_services": [
+          "postgres_audit.service"
+        ],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "audit.notify_compliance_channel",
+      "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/audit.notify_compliance_channel.input.schema.json",
+        "output_schema": "schemas/nodes/audit.notify_compliance_channel.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_audit.activities.notify_compliance_channel",
+        "image": "ghcr.io/ginstrom/bpg-nodes-audit-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-audit",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "network_io"
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "audit_logging",
+        "compliance_reporting",
+        "integration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "audit.create_case",
+      "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/audit.create_case.input.schema.json",
+        "output_schema": "schemas/nodes/audit.create_case.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_audit.activities.create_audit_case",
+        "image": "ghcr.io/ginstrom/bpg-nodes-audit-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-audit",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "network_io"
+      ],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "audit_logging",
+        "evidence_export",
+        "integration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "audit.attach_evidence",
+      "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/audit.attach_evidence.input.schema.json",
+        "output_schema": "schemas/nodes/audit.attach_evidence.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_audit.activities.attach_evidence_to_ticket",
+        "image": "ghcr.io/ginstrom/bpg-nodes-audit-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-audit",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "network_io"
+      ],
+      "version": "0.1.0"
+    }
+  ],
+  "observability": {
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-audit",
+    "python": "bpg-nodes-audit",
+    "version": "0.1.0"
+  },
+  "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/ginstrom/bpg"
+      }
+    ],
+    "repo": "https://github.com/ginstrom/bpg"
+  },
+  "trust": {
+    "level": "blessed"
+  },
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-audit-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-audit"
+  }
+}

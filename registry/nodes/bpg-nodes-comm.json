@@ -10,48 +10,187 @@
   "compatibility": {
     "bpg": ">=0.1.0"
   },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-comm",
+        "version": "0.1.0"
+      }
+    ]
+  },
   "id": "bpg.nodes.comm",
   "name": "BPG Communication Nodes",
   "nodes": [
     {
+      "capabilities": [
+        "http",
+        "integration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "http.gitlab",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/http.gitlab.input.schema.json",
+        "output_schema": "schemas/nodes/http.gitlab.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_comm.activities.http_gitlab",
+        "image": "ghcr.io/ginstrom/bpg-nodes-comm-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-comm",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "http",
+        "integration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "http.webhook",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/http.webhook.input.schema.json",
+        "output_schema": "schemas/nodes/http.webhook.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_comm.activities.http_webhook",
+        "image": "ghcr.io/ginstrom/bpg-nodes-comm-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-comm",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "email",
+        "integration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "notify.email",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/notify.email.input.schema.json",
+        "output_schema": "schemas/nodes/notify.email.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_comm.activities.notify_email",
+        "image": "ghcr.io/ginstrom/bpg-nodes-comm-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-comm",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "queue",
+        "integration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "queue.kafka",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/queue.kafka.input.schema.json",
+        "output_schema": "schemas/nodes/queue.kafka.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_comm.activities.queue_kafka",
+        "image": "ghcr.io/ginstrom/bpg-nodes-comm-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-comm",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     },
     {
+      "capabilities": [
+        "slack",
+        "human_in_the_loop",
+        "integration"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "slack.interactive",
       "idempotent": false,
+      "io": {
+        "input_schema": "schemas/nodes/slack.interactive.input.schema.json",
+        "output_schema": "schemas/nodes/slack.interactive.output.schema.json"
+      },
       "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_comm.activities.slack_interactive",
+        "image": "ghcr.io/ginstrom/bpg-nodes-comm-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-comm",
+        "type": "temporal_activity"
+      },
       "side_effects": [
         "network_io"
-      ]
+      ],
+      "version": "0.1.0"
     }
   ],
   "observability": {
@@ -60,13 +199,25 @@
   },
   "package": {
     "install": "uv add bpg-nodes-comm",
-    "python": "bpg-nodes-comm"
+    "python": "bpg-nodes-comm",
+    "version": "0.1.0"
   },
   "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/ginstrom/bpg"
+      }
+    ],
     "repo": "https://github.com/ginstrom/bpg"
   },
   "trust": {
     "level": "blessed"
   },
-  "type": "node_package"
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-comm-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-comm"
+  }
 }

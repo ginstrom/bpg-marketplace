@@ -141,12 +141,14 @@ bpg-marketplace/
 │
 ├── registry/
 │   ├── nodes/
+│   ├── recipes/
 │   ├── templates/
 │   ├── packs/
 │   └── policies/
 │
 ├── schemas/
 │   ├── node.schema.json
+│   ├── recipe.schema.json
 │   ├── template.schema.json
 │   ├── pack.schema.json
 │   └── policy.schema.json
@@ -207,7 +209,20 @@ Example packages:
 
 ---
 
-# 2. Workflow Templates
+# 2. Recipes
+
+Composable capability plans that describe how smaller nodes should be assembled during the BPG build flow.
+
+Recipes represent:
+
+* structured intent
+* capability-based or node-based step selection
+* default configuration and failure policy
+* tradeoffs for build-time selection
+
+---
+
+# 3. Workflow Templates
 
 Reusable workflow architectures.
 
@@ -227,7 +242,7 @@ Templates represent:
 
 ---
 
-# 3. Capability Packs
+# 4. Capability Packs
 
 Bundled functionality collections.
 
@@ -248,7 +263,7 @@ These may include:
 
 ---
 
-# 4. Policies
+# 5. Policies
 
 Reusable operational governance definitions.
 
@@ -621,4 +636,3 @@ Over:
 * UI complexity
 * monetization
 * large package counts
-

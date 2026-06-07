@@ -1,0 +1,109 @@
+{
+  "id": "bpg.recipes.opensearch_hybrid_index_japanese_chunk",
+  "type": "recipe",
+  "name": "OpenSearch Hybrid Index Japanese Chunk",
+  "summary": "Embeds a Japanese text chunk, tokenizes it for BM25 search, and writes both lexical and vector fields to OpenSearch.",
+  "version": "0.1.0",
+  "capabilities": [
+    "hybrid_search",
+    "hybrid_upsert",
+    "embedding",
+    "tokenization"
+  ],
+  "inputs": {
+    "chunk": {
+      "type": "object",
+      "required": [
+        "id",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "index": {
+      "type": "string"
+    },
+    "embedding_model": {
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "upsert": {
+      "type": "object",
+      "from": "$.steps.upsert"
+    }
+  },
+  "steps": [
+    {
+      "id": "embed",
+      "select": {
+        "capability": "embedding",
+        "preferred_node": "embedding.create_text_embedding",
+        "version": ">=0.1.0"
+      },
+      "with": {
+        "text": "$.chunk.text",
+        "model": "$.embedding_model"
+      }
+    },
+    {
+      "id": "tokenize",
+      "select": {
+        "capability": "tokenization",
+        "preferred_node": "tokenization.kuromoji_tokenize",
+        "version": ">=0.1.0"
+      },
+      "with": {
+        "text": "$.chunk.text",
+        "mode": "search"
+      }
+    },
+    {
+      "id": "upsert",
+      "select": {
+        "capability": "hybrid_upsert",
+        "preferred_node": "opensearch.hybrid_upsert",
+        "version": ">=0.1.0"
+      },
+      "with": {
+        "index": "$.index",
+        "id": "$.chunk.id",
+        "text": "$.chunk.text",
+        "tokens": {
+          "from": "$.steps.tokenize.token_details",
+          "transform": {
+            "type": "map",
+            "path": "$.surface"
+          }
+        },
+        "vector": "$.steps.embed.vector",
+        "metadata": "$.chunk.metadata"
+      }
+    }
+  ],
+  "defaults": {
+    "embedding_model": "text-embedding-3-small",
+    "tokenization_mode": "search"
+  },
+  "failure_policy": {
+    "on_step_failure": "fail",
+    "retry_steps": [
+      "embed",
+      "tokenize",
+      "upsert"
+    ]
+  },
+  "tradeoffs": [
+    "Indexes one chunk and leaves ingestion orchestration, retrieval, reranking, and evaluation to higher-level recipes or templates.",
+    "Uses declarative edge mapping to project Kuromoji token detail objects into the OpenSearch token string array."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "dimensions": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "model": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "vector": {
+      "items": {
+        "type": "number"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "vector",
+    "model",
+    "dimensions"
+  ],
+  "title": "Create Text Embedding Output",
+  "type": "object"
+}

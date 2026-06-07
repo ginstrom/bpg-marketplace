@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attached": {
+      "type": "boolean"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "evidence_ref": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "case_id",
+    "attached",
+    "evidence_ref",
+    "dry_run"
+  ],
+  "title": "Attach Evidence Output",
+  "type": "object"
+}
