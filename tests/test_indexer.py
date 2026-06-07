@@ -111,3 +111,26 @@ class IndexerTests(unittest.TestCase):
                 resolution_payload["nodes"]["opensearch.hybrid_upsert"][0]["execution"]["required_services"],
                 ["opensearch.service"],
             )
+
+    def test_node_level_worker_override_takes_precedence_over_package_default(self):
+        """Node-level worker fields must override package defaults in resolution output."""
+        with isolated_repo() as repo:
+            result = build_indexes(repo)
+            opensearch_service = result["resolution"]["nodes"]["opensearch.service"][0]
+            package_worker = result["resolution"]["packages"]["bpg.nodes.opensearch"]["worker"]
+
+            self.assertEqual(package_worker["install_mode"], "package")
+            self.assertEqual(package_worker["task_queue"], "bpg-opensearch")
+            self.assertEqual(
+                package_worker["image"],
+                "ghcr.io/ginstrom/bpg-nodes-opensearch-worker:0.1.0",
+            )
+
+            self.assertEqual(opensearch_service["worker"]["install_mode"], "container")
+            self.assertEqual(opensearch_service["worker"]["task_queue"], "bpg-opensearch-service")
+            self.assertEqual(
+                opensearch_service["worker"]["image"],
+                "docker.io/opensearchproject/opensearch:2.14.0",
+            )
+            self.assertNotEqual(opensearch_service["worker"]["install_mode"], package_worker["install_mode"])
+            self.assertNotEqual(opensearch_service["worker"]["task_queue"], package_worker["task_queue"])

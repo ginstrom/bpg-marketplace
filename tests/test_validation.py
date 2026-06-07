@@ -82,6 +82,23 @@ class ValidationTests(unittest.TestCase):
                 )
             )
 
+    def test_node_level_worker_override_validates(self):
+        """Validation accepts node-level worker blocks that differ from package defaults."""
+        with isolated_repo() as repo:
+            issues = validate_registry(repo)
+
+            self.assertEqual([], issues)
+            opensearch = json.loads(
+                (repo / "registry" / "nodes" / "opensearch.json").read_text(encoding="utf-8")
+            )
+            service_node = next(node for node in opensearch["nodes"] if node["id"] == "opensearch.service")
+            package_worker = opensearch["worker"]
+            node_worker = service_node["worker"]
+
+            self.assertEqual(package_worker["install_mode"], "package")
+            self.assertEqual(node_worker["install_mode"], "container")
+            self.assertNotEqual(node_worker["task_queue"], package_worker["task_queue"])
+
     def test_registry_validation_rejects_service_container_without_image(self):
         with isolated_repo() as repo:
             node_path = repo / "registry" / "nodes" / "weaviate.json"
@@ -387,6 +404,130 @@ class ValidationTests(unittest.TestCase):
             issues = validate_registry(repo)
 
             self.assertEqual([], issues)
+
+    def test_recipe_mapping_accepts_project_transform(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["id"] = {
+                "from": "$.chunk",
+                "transform": {
+                    "type": "project",
+                    "path": "$.id",
+                },
+            }
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertEqual([], issues)
+
+    def test_recipe_mapping_rejects_incompatible_project_transform(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["text"] = {
+                "from": "$.chunk.text",
+                "transform": {
+                    "type": "project",
+                    "path": "$.id",
+                },
+            }
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[2].with.text.transform is incompatible with source '$.chunk.text'"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_recipe_mapping_accepts_default_transform(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["metadata"] = {
+                "from": "$.chunk.metadata",
+                "transform": {
+                    "type": "default",
+                    "value": {},
+                },
+            }
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertEqual([], issues)
+
+    def test_recipe_mapping_rejects_incompatible_default_transform(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["index"] = {
+                "from": "$.index",
+                "transform": {
+                    "type": "default",
+                    "value": 42,
+                },
+            }
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[2].with.index is incompatible with selected node input schema"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_recipe_mapping_accepts_coerce_transform(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["inputs"]["shard_count"] = {"type": "integer"}
+            recipe["steps"][2]["with"]["id"] = {
+                "from": "$.shard_count",
+                "transform": {
+                    "type": "coerce",
+                    "to": "string",
+                },
+            }
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertEqual([], issues)
+
+    def test_recipe_mapping_rejects_incompatible_coerce_transform(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["index"] = {
+                "from": "$.index",
+                "transform": {
+                    "type": "coerce",
+                    "to": "boolean",
+                },
+            }
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[2].with.index is incompatible with selected node input schema"
+                    in issue.message
+                    for issue in issues
+                )
+            )
 
     def test_registry_validation_rejects_incompatible_projection_transform(self):
         with isolated_repo() as repo:
