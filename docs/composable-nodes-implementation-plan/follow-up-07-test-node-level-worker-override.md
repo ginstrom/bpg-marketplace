@@ -2,7 +2,7 @@
 
 [Documentation](../index.md) › [Implementation Plan](index.md) › [Follow-Up Work](follow-up-work.md) › Follow-Up 7: Node-Level Worker Override Tests
 
-**Status:** [ ] Not started
+**Status:** [x] Complete
 
 ## Goal
 

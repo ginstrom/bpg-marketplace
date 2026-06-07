@@ -34,7 +34,7 @@ Complete the checkboxes as work lands.
 
 ### Test Coverage
 
-- [ ] [Follow-Up 7: Test Node-Level Worker Override](follow-up-07-test-node-level-worker-override.md)
+- [x] [Follow-Up 7: Test Node-Level Worker Override](follow-up-07-test-node-level-worker-override.md)
 - [ ] [Follow-Up 8: Integration Tests for Remaining Transform Types](follow-up-08-integration-tests-transform-types.md)
 - [ ] [Follow-Up 9: Assert Generated Index Reproducibility in CI](follow-up-09-index-reproducibility-ci.md)
 

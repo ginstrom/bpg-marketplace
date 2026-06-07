@@ -2,7 +2,7 @@
 
 [Documentation](../index.md) › [Implementation Plan](index.md) › [Follow-Up Work](follow-up-work.md) › Follow-Up 4: Compound Version Constraints
 
-**Status:** [ ] Not started
+**Status:** [x] Complete
 
 ## Goal
 
