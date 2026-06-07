@@ -6,7 +6,7 @@ Provide an authoring-time verification command that checks declared runtime arti
 
 ## Scope
 
-This step adds optional checks suitable for marketplace CI and for BPG's build flow. It should fail clearly when dependencies are unavailable, but it should not require production infrastructure.
+This step adds optional checks suitable for marketplace CI and for [BPG](https://github.com/ginstrom/bpg)'s build flow. It should fail clearly when dependencies are unavailable, but it should not require production infrastructure.
 
 ## Tasks
 
@@ -32,7 +32,7 @@ Support at least two modes:
 - Runtime-light verification can detect a missing Python activity entrypoint.
 - Runtime-light verification can detect malformed container image references.
 - Verification failures are grouped by artifact ID.
-- BPG can call the verification logic through a command or stable library API.
+- [BPG](https://github.com/ginstrom/bpg) can call the verification logic through a command or stable library API.
 
 ## Notes
 

@@ -6,11 +6,11 @@
 
 ## Goal
 
-Document when and where to run `runtime-light` verification so marketplace, node package, and BPG engineers share the same expectations.
+Document when and where to run `runtime-light` verification so marketplace, node package, and [BPG](https://github.com/ginstrom/bpg) engineers share the same expectations.
 
 ## Scope
 
-Documentation. Optional cross-repo CI note for the BPG monorepo (out of repo changes unless explicitly requested).
+Documentation. Optional cross-repo CI note for the [BPG](https://github.com/ginstrom/bpg) monorepo (out of repo changes unless explicitly requested).
 
 ## Background
 
@@ -27,7 +27,7 @@ Running `python3 scripts/verify_registry.py --mode runtime-light` locally withou
   | --- | --- | --- |
   | Marketplace CI | `static` | Validates metadata, schemas, image references, entrypoint strings |
   | Node package repo CI | `runtime-light` | Run after `pip install` of the package; imports entrypoints |
-  | BPG build flow | `runtime-light` or stricter | Packages available in build environment |
+  | [BPG](https://github.com/ginstrom/bpg) build flow | `runtime-light` or stricter | Packages available in build environment |
   | Local authoring | `static` always; `runtime-light` when package installed | See commands below |
 
 - [ ] Document expected local commands:
@@ -47,7 +47,7 @@ Running `python3 scripts/verify_registry.py --mode runtime-light` locally withou
   - [ ] Differences from static mode (no import required for static).
 - [ ] Note that import failures in the marketplace repo alone are expected.
 - [ ] Cross-link from [Follow-Up 3: Expand Contributing Guidance](follow-up-03-expand-contributing-guidance.md).
-- [ ] Optionally add a short "Future work" note about a BPG monorepo CI job that syncs marketplace metadata and runs runtime-light with all packages installed.
+- [ ] Optionally add a short "Future work" note about a [BPG](https://github.com/ginstrom/bpg) monorepo CI job that syncs marketplace metadata and runs runtime-light with all packages installed.
 
 ## Acceptance Criteria
 
@@ -56,9 +56,9 @@ Running `python3 scripts/verify_registry.py --mode runtime-light` locally withou
 - Documentation is linked from `docs/index.md` (via Contributing or Temporal Activity Adapters).
 - No misleading implication that marketplace CI failures on runtime-light are bugs.
 
-## Out of Scope (BPG Repository)
+## Out of Scope ([BPG repository](https://github.com/ginstrom/bpg))
 
-These belong in BPG coordination, not `bpg-marketplace`:
+These belong in [BPG](https://github.com/ginstrom/bpg) coordination, not `bpg-marketplace`:
 
 - `bpg marketplace verify` CLI wrapping the library API
 - Monorepo CI job running runtime-light against all synced packages

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add validation beyond JSON Schema so authored recipes and nodes can be checked before publication and before BPG plan generation.
+Add validation beyond JSON Schema so authored recipes and nodes can be checked before publication and before [BPG](https://github.com/ginstrom/bpg) plan generation.
 
 ## Scope
 
@@ -25,7 +25,7 @@ This step adds static validation for references, version constraints, JSONPath m
 Use conservative initial rules:
 
 - A step may only read recipe inputs or outputs from earlier steps.
-- JSONPath must use the BPG-supported subset.
+- JSONPath must use the [BPG](https://github.com/ginstrom/bpg)-supported subset.
 - Exact node references must resolve to at least one node version.
 - Version constraints must resolve to at least one compatible version.
 - Mapped fields must exist in the source schema when source schema metadata is available.
@@ -44,4 +44,4 @@ Use conservative initial rules:
 
 ## Notes
 
-This validation is a precursor to BPG's build-time enforcement. Marketplace validation should make authoring errors cheap to catch, while BPG remains the final authority for environment-specific compatibility.
+This validation is a precursor to [BPG](https://github.com/ginstrom/bpg)'s build-time enforcement. Marketplace validation should make authoring errors cheap to catch, while [BPG](https://github.com/ginstrom/bpg) remains the final authority for environment-specific compatibility.

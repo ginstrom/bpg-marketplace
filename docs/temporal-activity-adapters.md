@@ -1,6 +1,6 @@
 # Temporal Activity Adapter Expectations
 
-Author guidance for exposing Temporal-compatible activity code in BPG node packages.
+Author guidance for exposing Temporal-compatible activity code in [BPG](https://github.com/ginstrom/bpg) node packages.
 
 ## Purpose
 
@@ -8,7 +8,7 @@ The marketplace registry describes runnable nodes. Node package repositories pro
 
 - node authors know how to structure Python packages and registry metadata
 - recipe authors know which nodes are callable workflow steps
-- BPG engineers know how build-time execution plans bind recipe steps to worker activity calls
+- [BPG](https://github.com/ginstrom/bpg) engineers know how build-time execution plans bind recipe steps to worker activity calls
 
 For the broader composable-nodes model, see [Composable Nodes and Recipes](composable-nodes-and-recipes.md).
 
@@ -25,7 +25,7 @@ Put these operations in activities or external services, not in workflow code:
 - container operations
 - search index writes
 
-In BPG terms:
+In [BPG](https://github.com/ginstrom/bpg) terms:
 
 | Layer | Responsibility |
 | --- | --- |
@@ -37,9 +37,9 @@ Service nodes such as `opensearch.service` and `weaviate.service` are dependenci
 
 ## Node metadata is the contract
 
-Node metadata is the contract between recipes, BPG build-time planning, and worker code.
+Node metadata is the contract between recipes, [BPG](https://github.com/ginstrom/bpg) build-time planning, and worker code.
 
-Recipes reference nodes by id or capability. BPG resolves those references into a locked execution plan with exact package versions, entrypoints, task queues, schemas, and service dependencies. Workers execute the locked plan at runtime.
+Recipes reference nodes by id or capability. [BPG](https://github.com/ginstrom/bpg) resolves those references into a locked execution plan with exact package versions, entrypoints, task queues, schemas, and service dependencies. Workers execute the locked plan at runtime.
 
 The activity entrypoint is worker-facing. The workflow-facing interface is the input and output JSON Schema.
 
@@ -63,7 +63,7 @@ Recommended conventions:
 - declare one marketplace registry file per package under `registry/nodes/`
 - store IO schemas under `schemas/nodes/` and `schemas/services/`
 
-Real packages in the BPG repository follow this pattern:
+Real packages in the [BPG repository](https://github.com/ginstrom/bpg) follow this pattern:
 
 - `bpg-nodes-search` for embedding and tokenization activities
 - `bpg-nodes-audit` for optional audit helper activities
@@ -106,7 +106,7 @@ __all__ = ["greet"]
 
 ### Implementation with `@node`
 
-Use the BPG SDK `@node` decorator to attach framework metadata to the implementation:
+Use the [BPG SDK](https://github.com/ginstrom/bpg) `@node` decorator to attach framework metadata to the implementation:
 
 ```python
 from typing import Any
@@ -173,7 +173,7 @@ Authoring rules:
 4. Treat activity return values as full output objects validated against the output schema.
 5. Use `additionalProperties: false` unless the node intentionally accepts extension fields.
 
-Recipe steps pass inputs with JSONPath references such as `$inputs.run_id` or `$.steps.export.bundle`. BPG validates those mappings during build and may generate internal adapter steps for simple field projection.
+Recipe steps pass inputs with JSONPath references such as `$inputs.run_id` or `$.steps.export.bundle`. [BPG](https://github.com/ginstrom/bpg) validates those mappings during build and may generate internal adapter steps for simple field projection.
 
 ## Retry, idempotency, and side effects
 
@@ -269,7 +269,7 @@ Rules:
 
 - service node ids use a stable suffix such as `.service`
 - recipe steps invoke executable nodes, not service nodes
-- BPG provisions required services before scheduling dependent activities
+- [BPG](https://github.com/ginstrom/bpg) provisions required services before scheduling dependent activities
 - service nodes still declare IO schemas and side effects for planning and documentation
 
 Example pair:
@@ -333,9 +333,9 @@ Use a service node when the marketplace entry represents infrastructure that act
 | Worker entrypoint required | Container image required, no entrypoint |
 | Input/output schemas describe request/response payloads | Schemas describe connection and health contract |
 
-## How BPG binds recipe steps to activity calls
+## How [BPG](https://github.com/ginstrom/bpg) binds recipe steps to activity calls
 
-Recipes describe intent. BPG build output describes execution.
+Recipes describe intent. [BPG](https://github.com/ginstrom/bpg) build output describes execution.
 
 Example recipe step:
 
@@ -352,7 +352,7 @@ Example recipe step:
 }
 ```
 
-During build, BPG:
+During build, [BPG](https://github.com/ginstrom/bpg):
 
 1. Resolves `audit.verify_chain` to an exact node version and package.
 2. Loads the node's input and output schemas.
@@ -377,7 +377,7 @@ The marketplace provides two verification modes via `scripts/verify_registry.py`
 | --- | --- | --- |
 | Marketplace CI | `static` | Validates metadata, schemas, image references, and entrypoint strings |
 | Node package repo CI | `runtime-light` | Run after `pip install` of the package; imports entrypoints |
-| BPG build flow | `runtime-light` or stricter | Packages available in the build environment |
+| [BPG](https://github.com/ginstrom/bpg) build flow | `runtime-light` or stricter | Packages available in the build environment |
 | Local authoring | `static` always; `runtime-light` when package installed | See commands below |
 
 ### Commands
@@ -405,13 +405,14 @@ Marketplace CI runs `--mode static` only. Node implementation packages (`bpg_nod
 
 Running `python3 scripts/verify_registry.py --mode runtime-light` locally without those packages installed will report import failures. That is expected behavior, not a marketplace bug. Node package authors should run runtime-light verification in their own repository after `pip install -e .`.
 
-### Future work (BPG repository)
+### Future work ([BPG repository](https://github.com/ginstrom/bpg))
 
 - `bpg marketplace verify` CLI wrapping the library API
 - Monorepo CI job that syncs marketplace metadata and runs runtime-light with all packages installed
 
 ## Related documentation
 
+- [BPG](https://github.com/ginstrom/bpg) — workflow platform, CLI, and SDK
 - [Composable Nodes and Recipes](composable-nodes-and-recipes.md)
 - [Audit Helper Nodes](audit-helper-nodes.md) — real post-run activity examples
 - [Capability Taxonomy](capability-taxonomy.md)

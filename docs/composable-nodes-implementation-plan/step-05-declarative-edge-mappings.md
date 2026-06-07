@@ -63,7 +63,7 @@ Use normal node packages for:
 
 ## Execution Plan Output
 
-BPG should compile supported mapping objects into internal adapter operations in the locked execution plan. These internal operations should be deterministic and schema-checked, but they should not be indexed as marketplace artifacts.
+[BPG](https://github.com/ginstrom/bpg) should compile supported mapping objects into internal adapter operations in the locked execution plan. These internal operations should be deterministic and schema-checked, but they should not be indexed as marketplace artifacts.
 
 ## Acceptance Criteria
 

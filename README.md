@@ -1,6 +1,6 @@
 # bpg-marketplace
 
-`bpg-marketplace` is a GitHub-native registry for reusable BPG workflow components, recipes, templates, packs, and policies.
+`bpg-marketplace` is a GitHub-native registry for reusable [BPG](https://github.com/ginstrom/bpg) workflow components, recipes, templates, packs, and policies.
 
 This repository is structured around machine-readable metadata rather than a visual application. The current scaffold includes:
 
@@ -31,16 +31,26 @@ The generated indexes remain:
 
 * `generated/index.json` for the full artifact catalog
 * `generated/capabilities.json` for artifact-level capability-first lookup
-* `generated/resolution.json` for BPG build-time recipe and node resolution metadata
+* `generated/resolution.json` for [BPG](https://github.com/ginstrom/bpg) build-time recipe and node resolution metadata
 * `generated/recipes.json` for recipe-only lookup
 * `generated/templates.json` for template-only lookup
 * `generated/compatibility.json` for compatibility and trust metadata
 
 Use `generated/resolution.json` when generating locked execution plans. It includes node-level capability candidates, exact node versions, runtime and worker metadata, service and secret dependencies, IO schema references, recipe step selectors, and declarative mapping transforms. The older `generated/capabilities.json` remains artifact-level for existing discovery consumers.
 
+## Documentation
+
+See [docs/index.md](docs/index.md) for the full documentation index. Key entry points:
+
+* [Design](docs/design.md) — marketplace goals, artifact model, and trust levels
+* [Composable Nodes and Recipes](docs/composable-nodes-and-recipes.md) — node packages, recipes, and build-time execution plans
+* [Contributing](docs/contributing.md) — local validation workflow and authoring guidance
+
+The marketplace provides discovery metadata and validation for components consumed by the [BPG](https://github.com/ginstrom/bpg) build flow. Runtime execution, workflow orchestration, and CLI tooling live in the [BPG repository](https://github.com/ginstrom/bpg).
+
 ## Layout
 
-See [docs/design.md](/home/ryan/dev/bpg-marketplace/docs/design.md) for the full design basis. The implemented repo layout follows that document:
+See [docs/design.md](docs/design.md) for the full design basis. The implemented repo layout follows that document:
 
 * `registry/` source metadata for marketplace artifacts
 * `schemas/` JSON Schema definitions

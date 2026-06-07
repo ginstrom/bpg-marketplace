@@ -26,14 +26,14 @@ The documentation should state:
 - Workflow code must stay deterministic.
 - Network calls, model calls, tokenization, file IO, container operations, and search writes belong in activities or external services.
 - Activity functions should accept schema-shaped inputs and return schema-shaped outputs.
-- Node metadata is the contract between recipes, BPG build-time planning, and worker code.
+- Node metadata is the contract between recipes, [BPG](https://github.com/ginstrom/bpg) build-time planning, and worker code.
 - Service nodes such as OpenSearch and Weaviate are dependencies, not activity entrypoints.
 
 ## Acceptance Criteria
 
 - A node author can understand how to declare a Temporal activity node.
 - A node author can understand when to use a service node.
-- A BPG engineer can understand how generated execution plans should bind recipe steps to activity calls.
+- A [BPG](https://github.com/ginstrom/bpg) engineer can understand how generated execution plans should bind recipe steps to activity calls.
 - The documentation is linked from `docs/index.md`.
 
 ## Notes

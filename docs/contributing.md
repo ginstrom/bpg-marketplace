@@ -44,5 +44,6 @@ For a minimal authoring reference, see [`examples/node-authoring/sample-greet-no
 
 ## Broader context
 
+* [BPG](https://github.com/ginstrom/bpg) — workflow platform that consumes marketplace metadata at build time
 * [Composable Nodes Implementation Plan](composable-nodes-implementation-plan/index.md) — delivery history for the composable nodes foundation
 * [Follow-Up Work](composable-nodes-implementation-plan/follow-up-work.md) — tracked polish and deferred items from the implementation audit
