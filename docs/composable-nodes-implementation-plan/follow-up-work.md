@@ -24,12 +24,12 @@ Complete the checkboxes as work lands.
 
 - [x] [Follow-Up 1: Update Capability Taxonomy](follow-up-01-update-capability-taxonomy.md)
 - [x] [Follow-Up 2: Reconcile Design Doc Examples with Implementation](follow-up-02-reconcile-design-doc-examples.md)
-- [ ] [Follow-Up 3: Expand Contributing Guidance](follow-up-03-expand-contributing-guidance.md)
+- [x] [Follow-Up 3: Expand Contributing Guidance](follow-up-03-expand-contributing-guidance.md)
 
 ### Validation and Schema
 
 - [x] [Follow-Up 4: Support Compound Version Constraints](follow-up-04-compound-version-constraints.md)
-- [ ] [Follow-Up 5: Decide on Structured `preferred_node` References](follow-up-05-structured-preferred-node-references.md)
+- [x] [Follow-Up 5: Decide on Structured `preferred_node` References](follow-up-05-structured-preferred-node-references.md)
 - [ ] [Follow-Up 6: Add an `external_service` Registry Example](follow-up-06-external-service-registry-example.md) — defer until a real external dependency is ready
 
 ### Test Coverage

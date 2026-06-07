@@ -24,7 +24,7 @@ Remaining polish, documentation drift, and deferred enforcement from the impleme
 
 - [x] [Follow-Up 1: Update Capability Taxonomy](follow-up-01-update-capability-taxonomy.md)
 - [x] [Follow-Up 2: Reconcile Design Doc Examples](follow-up-02-reconcile-design-doc-examples.md)
-- [ ] [Follow-Up 3: Expand Contributing Guidance](follow-up-03-expand-contributing-guidance.md)
+- [x] [Follow-Up 3: Expand Contributing Guidance](follow-up-03-expand-contributing-guidance.md)
 
 ### Validation and Schema
 
