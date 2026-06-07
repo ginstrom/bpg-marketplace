@@ -39,3 +39,8 @@ The documentation should state:
 ## Notes
 
 Keep examples small. The purpose is to establish expectations for package authors before stronger verification and generated worker bindings are implemented.
+
+## Delivered
+
+- [Temporal Activity Adapter Expectations](../temporal-activity-adapters.md)
+- [Sample greet node example](../../examples/node-authoring/sample-greet-node/README.md)

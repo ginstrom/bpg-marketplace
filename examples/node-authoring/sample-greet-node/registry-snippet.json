@@ -1,0 +1,29 @@
+{
+  "id": "example.greet",
+  "version": "0.1.0",
+  "capabilities": ["example"],
+  "runtime": {
+    "type": "temporal_activity",
+    "language": "python",
+    "entrypoint": "greet_node.activities.greet",
+    "task_queue": "bpg-example",
+    "image": "ghcr.io/example/bpg-nodes-example-worker:0.1.0"
+  },
+  "io": {
+    "input_schema": "schemas/nodes/example.greet.input.schema.json",
+    "output_schema": "schemas/nodes/example.greet.output.schema.json"
+  },
+  "retryable": true,
+  "idempotent": true,
+  "side_effects": [],
+  "execution": {
+    "required_secrets": [],
+    "required_services": [],
+    "requires_network": false,
+    "resources": {
+      "cpu": "250m",
+      "memory": "512Mi",
+      "timeout_seconds": 30
+    }
+  }
+}

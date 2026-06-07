@@ -14,7 +14,7 @@ Each step is intended to be small enough to hand to an engineer. Complete the ch
 - [x] [Step 6: Index Recipes and Resolution Metadata](step-06-index-recipes-and-resolution-metadata.md)
 - [x] [Step 7: Validate References and Schema Compatibility](step-07-reference-and-schema-validation.md)
 - [x] [Step 8: Add Lightweight Runtime Verification](step-08-lightweight-runtime-verification.md)
-- [ ] [Step 9: Document Temporal Activity Adapter Expectations](step-09-temporal-activity-adapters.md)
+- [x] [Step 9: Document Temporal Activity Adapter Expectations](step-09-temporal-activity-adapters.md)
 
 ## Expected End State
 
