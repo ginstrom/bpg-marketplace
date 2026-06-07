@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bundle": {
+      "type": "object"
+    },
+    "dsn": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dsn_env": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "format": {
+      "enum": [
+        "markdown",
+        "json"
+      ],
+      "type": "string"
+    },
+    "from_checkpoint": {
+      "type": "boolean"
+    },
+    "policy_tags": {
+      "type": "object"
+    },
+    "require_anchor": {
+      "type": "boolean"
+    },
+    "run_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id"
+  ],
+  "title": "Write Compliance Summary Input",
+  "type": "object"
+}

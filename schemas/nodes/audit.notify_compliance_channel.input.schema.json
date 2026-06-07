@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "channel": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "channel_type": {
+      "enum": [
+        "slack",
+        "email",
+        "webhook"
+      ],
+      "type": "string"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "dsn": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dsn_env": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "webhook_url": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "channel",
+    "channel_type"
+  ],
+  "title": "Notify Compliance Channel Input",
+  "type": "object"
+}

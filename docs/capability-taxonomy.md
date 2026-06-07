@@ -3,6 +3,9 @@
 Initial capability vocabulary used by the sample registry:
 
 * `audit_logging`
+* `audit_verification`
+* `compliance_reporting`
+* `evidence_export`
 * `human_approval`
 * `hybrid_search`
 * `trace_emission`

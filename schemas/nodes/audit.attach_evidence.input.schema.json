@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bundle": {
+      "type": "object"
+    },
+    "bundle_path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "case_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "case_url": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "run_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "case_id"
+  ],
+  "title": "Attach Evidence Input",
+  "type": "object"
+}

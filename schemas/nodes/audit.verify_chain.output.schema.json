@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "event_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "valid": {
+      "type": "boolean"
+    },
+    "verification": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "run_id",
+    "valid",
+    "verification",
+    "event_count"
+  ],
+  "title": "Verify Audit Chain Output",
+  "type": "object"
+}

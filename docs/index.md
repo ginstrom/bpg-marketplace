@@ -8,3 +8,4 @@ Core repository documentation for `bpg-marketplace`.
 * [Contributing](contributing.md)
 * [Trust Levels](trust-levels.md)
 * [Capability Taxonomy](capability-taxonomy.md)
+* [Audit Helper Nodes](audit-helper-nodes.md)
