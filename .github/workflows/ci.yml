@@ -20,6 +20,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Validate registry
         run: python scripts/validate_registry.py
+      - name: Verify registry artifacts
+        run: python scripts/verify_registry.py --mode static
       - name: Verify package metadata
         run: python scripts/verify_packages.py
       - name: Build generated indexes
