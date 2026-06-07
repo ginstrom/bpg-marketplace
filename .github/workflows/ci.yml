@@ -26,3 +26,5 @@ jobs:
         run: python scripts/verify_packages.py
       - name: Build generated indexes
         run: python scripts/build_index.py
+      - name: Check index reproducibility
+        run: python scripts/check_index_reproducibility.py

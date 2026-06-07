@@ -28,7 +28,13 @@ python3 scripts/build_index.py
 | `build_index.py` | After registry changes that affect discovery or resolution output |
 | `verify_registry.py --mode runtime-light` | After installing the node package locally (see [Temporal Activity Adapters](temporal-activity-adapters.md#verification-modes)) |
 
-CI runs the same checks (using `python` after `setup-python`) plus `verify_packages.py` and an index reproducibility check. See [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
+CI runs the same checks (using `python` after `setup-python`) plus `verify_packages.py` and an index reproducibility check:
+
+```bash
+python3 scripts/check_index_reproducibility.py
+```
+
+See [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 
 ## Node package authors
 
