@@ -457,6 +457,8 @@ This keeps runtime behavior predictable. Runtime systems should execute the lock
 
 ## Capability Resolution
 
+Capability tags should match the vocabulary in [Capability Taxonomy](capability-taxonomy.md).
+
 When a recipe selects by capability, the marketplace consumer should resolve candidates using:
 
 1. BPG compatibility

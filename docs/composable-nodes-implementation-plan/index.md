@@ -16,6 +16,29 @@ Each step is intended to be small enough to hand to an engineer. Complete the ch
 - [x] [Step 8: Add Lightweight Runtime Verification](step-08-lightweight-runtime-verification.md)
 - [x] [Step 9: Document Temporal Activity Adapter Expectations](step-09-temporal-activity-adapters.md)
 
+## Follow-Up Work
+
+Remaining polish, documentation drift, and deferred enforcement from the implementation audit. See [Follow-Up Work](follow-up-work.md) for the full index.
+
+### Documentation
+
+- [x] [Follow-Up 1: Update Capability Taxonomy](follow-up-01-update-capability-taxonomy.md)
+- [ ] [Follow-Up 2: Reconcile Design Doc Examples](follow-up-02-reconcile-design-doc-examples.md)
+- [ ] [Follow-Up 3: Expand Contributing Guidance](follow-up-03-expand-contributing-guidance.md)
+
+### Validation and Schema
+
+- [ ] [Follow-Up 4: Compound Version Constraints](follow-up-04-compound-version-constraints.md)
+- [ ] [Follow-Up 5: Structured `preferred_node` References](follow-up-05-structured-preferred-node-references.md)
+- [ ] [Follow-Up 6: `external_service` Registry Example](follow-up-06-external-service-registry-example.md)
+
+### Test Coverage and Verification
+
+- [ ] [Follow-Up 7: Node-Level Worker Override Tests](follow-up-07-test-node-level-worker-override.md)
+- [ ] [Follow-Up 8: Transform Type Integration Tests](follow-up-08-integration-tests-transform-types.md)
+- [ ] [Follow-Up 9: Index Reproducibility in CI](follow-up-09-index-reproducibility-ci.md)
+- [ ] [Follow-Up 10: Runtime-Light Verification Expectations](follow-up-10-runtime-light-verification-expectations.md)
+
 ## Expected End State
 
 After these steps, the marketplace should support:
