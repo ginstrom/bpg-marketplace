@@ -7,6 +7,76 @@
     "node_id": {
       "type": "string",
       "pattern": "^(bpg\\.)?[a-z0-9_.-]+$"
+    },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transform": {
+          "$ref": "#/$defs/mapping_transform"
+        }
+      }
+    },
+    "mapping_transform": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "path"],
+          "properties": {
+            "type": {
+              "const": "project"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "path"],
+          "properties": {
+            "type": {
+              "const": "map"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "value"],
+          "properties": {
+            "type": {
+              "const": "default"
+            },
+            "value": true
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "to"],
+          "properties": {
+            "type": {
+              "const": "coerce"
+            },
+            "to": {
+              "enum": ["string", "number", "integer", "boolean"]
+            }
+          }
+        }
+      ]
     }
   },
   "required": [
@@ -108,7 +178,17 @@
           },
           "with": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "$ref": "#/$defs/mapping"
+                }
+              ]
+            }
           },
           "optional": {
             "type": "boolean"

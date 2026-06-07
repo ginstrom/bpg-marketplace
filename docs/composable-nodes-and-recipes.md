@@ -391,7 +391,7 @@ For example, a Kuromoji tokenizer may return rich token objects, while an OpenSe
   },
   "with": {
     "tokens": {
-      "from": "$.steps.tokenize.tokens",
+      "from": "$.steps.tokenize.token_details",
       "transform": {
         "type": "map",
         "path": "$.surface"

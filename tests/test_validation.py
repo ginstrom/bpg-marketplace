@@ -126,16 +126,67 @@ class ValidationTests(unittest.TestCase):
     def test_japanese_hybrid_indexing_recipe_validates(self):
         with isolated_repo() as repo:
             recipe_schema = json.loads((repo / "schemas" / "recipe.schema.json").read_text(encoding="utf-8"))
+            basic_recipe = json.loads(
+                (repo / "registry" / "recipes" / "basic-rag-search.json").read_text(encoding="utf-8")
+            )
             recipe = json.loads(
                 (repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json").read_text(
                     encoding="utf-8"
                 )
             )
 
+            Draft202012Validator(recipe_schema).validate(basic_recipe)
             Draft202012Validator(recipe_schema).validate(recipe)
             self.assertEqual(recipe["id"], JAPANESE_HYBRID_RECIPE_ID)
             self.assertEqual(["embed", "tokenize", "upsert"], [step["id"] for step in recipe["steps"]])
-            self.assertEqual(recipe["steps"][2]["with"]["tokens"], "$.steps.tokenize.tokens")
+            self.assertEqual(basic_recipe["steps"][0]["with"]["query"], "$inputs.query")
+            self.assertEqual(
+                recipe["steps"][2]["with"]["tokens"],
+                {
+                    "from": "$.steps.tokenize.token_details",
+                    "transform": {
+                        "type": "map",
+                        "path": "$.surface",
+                    },
+                },
+            )
+
+    def test_recipe_mapping_schema_rejects_unsupported_transform_type(self):
+        with isolated_repo() as repo:
+            recipe_schema = json.loads((repo / "schemas" / "recipe.schema.json").read_text(encoding="utf-8"))
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["tokens"]["transform"]["type"] = "explode"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            self.assertFalse(Draft202012Validator(recipe_schema).is_valid(recipe))
+            issues = validate_registry(repo)
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[2].with.tokens.transform.type must be one of project, map, default, coerce"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_recipe_mapping_schema_rejects_empty_source(self):
+        with isolated_repo() as repo:
+            recipe_schema = json.loads((repo / "schemas" / "recipe.schema.json").read_text(encoding="utf-8"))
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["tokens"]["from"] = ""
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            self.assertFalse(Draft202012Validator(recipe_schema).is_valid(recipe))
+            issues = validate_registry(repo)
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[2].with.tokens.from must be a non-empty string" in issue.message
+                    for issue in issues
+                )
+            )
 
     def test_japanese_hybrid_indexing_recipe_references_existing_nodes(self):
         with isolated_repo() as repo:

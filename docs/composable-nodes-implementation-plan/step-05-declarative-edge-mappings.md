@@ -30,7 +30,7 @@ Use this shape for edge-level adaptation:
 ```json
 {
   "tokens": {
-    "from": "$.steps.tokenize.tokens",
+    "from": "$.steps.tokenize.token_details",
     "transform": {
       "type": "map",
       "path": "$.surface"
@@ -70,7 +70,7 @@ BPG should compile supported mapping objects into internal adapter operations in
 - Recipes can use either JSONPath strings or mapping objects in `with` blocks.
 - Unsupported transform types fail recipe validation.
 - Mapping objects require a non-empty `from` JSONPath.
-- The Japanese hybrid indexing recipe can map Kuromoji token objects into OpenSearch token strings.
+- The Japanese hybrid indexing recipe can map Kuromoji token detail objects into OpenSearch token strings.
 - Documentation clearly distinguishes declarative mappings, generated internal adapters, and real adapter nodes.
 
 ## Notes

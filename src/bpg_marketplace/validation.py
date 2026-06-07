@@ -311,10 +311,74 @@ def _validate_recipe(payload: dict) -> list[str]:
         for key in ["capability", "node", "preferred_node", "version"]:
             if key in select and (not isinstance(select[key], str) or not select[key].strip()):
                 errors.append(f"{prefix}.select.{key} must be a non-empty string")
-        if "with" in step and not isinstance(step["with"], dict):
-            errors.append(f"{prefix}.with must be an object")
+        if "with" in step:
+            if not isinstance(step["with"], dict):
+                errors.append(f"{prefix}.with must be an object")
+            else:
+                errors.extend(_validate_recipe_step_mappings(prefix, step["with"]))
         if "optional" in step and not isinstance(step["optional"], bool):
             errors.append(f"{prefix}.optional must be a boolean")
+
+    return errors
+
+
+def _validate_recipe_step_mappings(prefix: str, mappings: dict) -> list[str]:
+    errors: list[str] = []
+    for field_name, mapping in mappings.items():
+        field_prefix = f"{prefix}.with.{field_name}"
+        if isinstance(mapping, str):
+            if not mapping.strip():
+                errors.append(f"{field_prefix} must be a non-empty string or mapping object")
+            continue
+        if not isinstance(mapping, dict):
+            errors.append(f"{field_prefix} must be a non-empty string or mapping object")
+            continue
+
+        source = mapping.get("from")
+        if not isinstance(source, str) or not source.strip():
+            errors.append(f"{field_prefix}.from must be a non-empty string")
+        allowed_mapping_keys = {"from", "transform"}
+        for key in mapping:
+            if key not in allowed_mapping_keys:
+                errors.append(f"{field_prefix}.{key} is not supported")
+
+        if "transform" in mapping:
+            errors.extend(_validate_recipe_mapping_transform(field_prefix, mapping["transform"]))
+
+    return errors
+
+
+def _validate_recipe_mapping_transform(prefix: str, transform: object) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(transform, dict):
+        return [f"{prefix}.transform must be an object"]
+
+    transform_type = transform.get("type")
+    if transform_type not in {"project", "map", "default", "coerce"}:
+        errors.append(f"{prefix}.transform.type must be one of project, map, default, coerce")
+        return errors
+
+    required_keys = {
+        "project": {"type", "path"},
+        "map": {"type", "path"},
+        "default": {"type", "value"},
+        "coerce": {"type", "to"},
+    }[transform_type]
+    allowed_keys = required_keys
+
+    for key in required_keys:
+        if key not in transform:
+            errors.append(f"{prefix}.transform.{key} is required for {transform_type}")
+    for key in transform:
+        if key not in allowed_keys:
+            errors.append(f"{prefix}.transform.{key} is not supported for {transform_type}")
+
+    if transform_type in {"project", "map"}:
+        path = transform.get("path")
+        if not isinstance(path, str) or not path.strip():
+            errors.append(f"{prefix}.transform.path must be a non-empty string")
+    if transform_type == "coerce" and transform.get("to") not in {"string", "number", "integer", "boolean"}:
+        errors.append(f"{prefix}.transform.to must be one of string, number, integer, boolean")
 
     return errors
 

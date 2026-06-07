@@ -78,7 +78,13 @@
         "index": "$.index",
         "id": "$.chunk.id",
         "text": "$.chunk.text",
-        "tokens": "$.steps.tokenize.tokens",
+        "tokens": {
+          "from": "$.steps.tokenize.token_details",
+          "transform": {
+            "type": "map",
+            "path": "$.surface"
+          }
+        },
         "vector": "$.steps.embed.vector",
         "metadata": "$.chunk.metadata"
       }
@@ -98,6 +104,6 @@
   },
   "tradeoffs": [
     "Indexes one chunk and leaves ingestion orchestration, retrieval, reranking, and evaluation to higher-level recipes or templates.",
-    "Uses plain JSONPath token wiring until declarative edge mapping support lands in Step 5."
+    "Uses declarative edge mapping to project Kuromoji token detail objects into the OpenSearch token string array."
   ]
 }

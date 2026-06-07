@@ -25,8 +25,8 @@ This step adds a recipe artifact and tests that it validates. It should use the 
 The recipe should run:
 
 1. `embed`: converts `$.chunk.text` to `$.steps.embed.vector`.
-2. `tokenize`: converts `$.chunk.text` to `$.steps.tokenize.tokens`.
-3. `upsert`: writes `$.chunk.text`, `$.steps.embed.vector`, and projected token surfaces from `$.steps.tokenize.tokens` to OpenSearch.
+2. `tokenize`: converts `$.chunk.text` to `$.steps.tokenize.tokens` and `$.steps.tokenize.token_details`.
+3. `upsert`: writes `$.chunk.text`, `$.steps.embed.vector`, and projected token surfaces from `$.steps.tokenize.token_details` to OpenSearch.
 
 ## Acceptance Criteria
 
@@ -45,7 +45,7 @@ If Step 5 has not landed yet, this recipe may temporarily use plain JSONPath str
 ```json
 {
   "tokens": {
-    "from": "$.steps.tokenize.tokens",
+    "from": "$.steps.tokenize.token_details",
     "transform": {
       "type": "map",
       "path": "$.surface"
