@@ -564,5 +564,6 @@ The next design-to-implementation pass should break this into:
 5. add declarative edge mappings and generated internal adapter semantics
 6. update index generation to include recipes and capability resolution metadata
 7. update validation to catch invalid node references, recipe step references, and incompatible mappings
-8. add CI checks for declared Python entrypoints and container references
-9. document Temporal activity adapter expectations for node packages
+8. add CI checks that rebuild ignored generated indexes from checked-in registry metadata
+9. add CI checks for declared Python entrypoints and container references
+10. document Temporal activity adapter expectations for node packages
