@@ -1,4 +1,4 @@
-# Step 5: Index Recipes and Resolution Metadata
+# Step 6: Index Recipes and Resolution Metadata
 
 ## Goal
 
@@ -15,8 +15,9 @@ This step changes index generation output. It does not implement BPG execution p
 3. Add node version metadata to node indexes.
 4. Add runtime type metadata to node indexes.
 5. Add dependency metadata for services, workers, secrets, and package artifacts.
-6. Add tests for generated index contents.
-7. Update documentation for index consumers.
+6. Add mapping metadata needed to generate internal adapter operations from recipe `with` blocks.
+7. Add tests for generated index contents.
+8. Update documentation for index consumers.
 
 ## Index Requirements
 
@@ -27,6 +28,7 @@ Generated indexes should let a BPG build flow answer:
 - Which exact node versions are available for a node ID?
 - Which services and workers are required by a selected node?
 - Which IO schemas must be checked before plan generation?
+- Which recipe edges require declarative mapping transforms?
 
 ## Acceptance Criteria
 
@@ -34,9 +36,9 @@ Generated indexes should let a BPG build flow answer:
 - Capabilities can resolve to both nodes and recipes.
 - Node entries include exact node version and runtime type.
 - Service node dependencies are visible from indexes.
+- Declarative mapping transforms remain visible to BPG plan generation.
 - Existing index consumers remain compatible or have an explicit migration note.
 
 ## Notes
 
 Resolution should still happen in BPG. This repository should provide enough indexed metadata for BPG to generate a locked plan with exact package versions, image digests, node IDs, node versions, schema versions, defaults, and workflow bindings.
-

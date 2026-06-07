@@ -376,6 +376,46 @@ Minimum useful semantics:
 
 Data mapping should use a standard format. JSONPath is the preferred default because recipe inputs, step outputs, and generated execution plans are JSON-shaped, and JSONPath is widely recognizable to both humans and tooling. BPG should define the supported JSONPath subset rather than accepting every dialect-specific extension.
 
+### Declarative Edge Mappings and Adapters
+
+Recipes should treat data adaptation as an edge concern before introducing new executable nodes.
+
+For example, a Kuromoji tokenizer may return rich token objects, while an OpenSearch BM25 field may only need token strings. The recipe should be able to declare that projection at the edge between steps:
+
+```json
+{
+  "id": "upsert",
+  "select": {
+    "node": "opensearch.hybrid_upsert",
+    "version": ">=0.1.0"
+  },
+  "with": {
+    "tokens": {
+      "from": "$.steps.tokenize.tokens",
+      "transform": {
+        "type": "map",
+        "path": "$.surface"
+      }
+    }
+  }
+}
+```
+
+BPG should compile simple declarative mappings into the locked execution plan. The generated plan may contain internal adapter operations, but the marketplace should not require a separate adapter artifact for every field projection.
+
+Use declarative mappings for:
+
+* field projection
+* field rename
+* defaulting
+* flattening
+* simple scalar coercion
+* selecting array fields such as token surfaces
+
+Use real adapter nodes when the transformation is reusable, version-sensitive, domain-specific, expensive, or policy-bearing. Examples include language-specific normalization, sparse-vector generation, model-specific embedding migration, retrieval result shaping, and custom document construction with nontrivial business rules.
+
+This keeps recipes composable without causing the marketplace to fill with one-off adapter packages. Adapter nodes remain normal nodes with `runtime.type: temporal_activity`; internal execution-plan adapters are generated from declarative mappings and are not marketplace artifacts.
+
 Later semantics can include:
 
 * parallel branches
@@ -410,6 +450,7 @@ The BPG build output is the deployable plan:
 * resolved services
 * validated input/output schema links
 * selected defaults
+* generated declarative mapping adapters
 * generated workflow/activity bindings
 
 This keeps runtime behavior predictable. Runtime systems should execute the locked plan rather than re-resolving marketplace choices dynamically on every workflow run.
@@ -462,6 +503,7 @@ Useful lightweight checks:
 * import declared Python activity entrypoints when package dependencies are installed
 * load declared input/output schemas
 * verify recipe mappings reference valid inputs and prior step ids
+* verify declarative mapping transforms are in the supported subset
 * check that exact node references and version constraints can resolve against the local registry
 
 These checks should be available both in marketplace CI and from BPG, for example as a `bpg marketplace verify` or equivalent build-time command.
@@ -519,7 +561,8 @@ The next design-to-implementation pass should break this into:
 2. extend node schema with runtime, IO, execution, artifacts, and dependencies
 3. add sample atomic search nodes
 4. add sample Japanese hybrid indexing recipe
-5. update index generation to include recipes and capability resolution metadata
-6. update validation to catch invalid node references and recipe step references
-7. add CI checks for declared Python entrypoints and container references
-8. document Temporal activity adapter expectations for node packages
+5. add declarative edge mappings and generated internal adapter semantics
+6. update index generation to include recipes and capability resolution metadata
+7. update validation to catch invalid node references, recipe step references, and incompatible mappings
+8. add CI checks for declared Python entrypoints and container references
+9. document Temporal activity adapter expectations for node packages

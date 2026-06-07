@@ -3,6 +3,12 @@
   "title": "BPG Recipe",
   "type": "object",
   "additionalProperties": false,
+  "$defs": {
+    "node_id": {
+      "type": "string",
+      "pattern": "^(bpg\\.)?[a-z0-9_.-]+$"
+    }
+  },
   "required": [
     "id",
     "type",
@@ -75,12 +81,10 @@
                 "pattern": "^[a-z][a-z0-9_]*$"
               },
               "node": {
-                "type": "string",
-                "pattern": "^bpg\\.[a-z0-9_.-]+$"
+                "$ref": "#/$defs/node_id"
               },
               "preferred_node": {
-                "type": "string",
-                "pattern": "^bpg\\.[a-z0-9_.-]+$"
+                "$ref": "#/$defs/node_id"
               },
               "version": {
                 "type": "string",

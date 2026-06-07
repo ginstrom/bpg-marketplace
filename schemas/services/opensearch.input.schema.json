@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "cluster_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "host": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "port": {
+      "maximum": 65535,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "security_enabled": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "host",
+    "port"
+  ],
+  "title": "OpenSearch Service Input",
+  "type": "object"
+}

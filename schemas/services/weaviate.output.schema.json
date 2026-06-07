@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "endpoint": {
+      "format": "uri",
+      "type": "string"
+    },
+    "health": {
+      "enum": [
+        "ready",
+        "not_ready",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "service": {
+      "const": "weaviate"
+    }
+  },
+  "required": [
+    "service",
+    "endpoint",
+    "health"
+  ],
+  "title": "Weaviate Service Output",
+  "type": "object"
+}

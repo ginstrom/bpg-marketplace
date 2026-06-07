@@ -1,6 +1,7 @@
 {
   "capabilities": [
     "embedding",
+    "tokenization",
     "vector_search",
     "hybrid_search",
     "vector_upsert"
@@ -33,6 +34,37 @@
           "timeout_seconds": 120
         }
       },
+      "id": "embedding.create_text_embedding",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/embedding.create_text_embedding.input.schema.json",
+        "output_schema": "schemas/nodes/embedding.create_text_embedding.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.create_text_embedding",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "embedding"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "250m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
       "id": "embed.text",
       "idempotent": true,
       "io": {
@@ -42,6 +74,37 @@
       "retryable": true,
       "runtime": {
         "entrypoint": "bpg_nodes_search.activities.embed_text",
+        "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-search",
+        "type": "temporal_activity"
+      },
+      "side_effects": [],
+      "version": "0.1.0"
+    },
+    {
+      "capabilities": [
+        "tokenization"
+      ],
+      "execution": {
+        "required_secrets": [],
+        "required_services": [],
+        "requires_network": false,
+        "resources": {
+          "cpu": "500m",
+          "memory": "1Gi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "tokenization.kuromoji_tokenize",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/tokenization.kuromoji_tokenize.input.schema.json",
+        "output_schema": "schemas/nodes/tokenization.kuromoji_tokenize.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_search.activities.kuromoji_tokenize",
         "image": "ghcr.io/ginstrom/bpg-nodes-search-worker:0.1.0",
         "language": "python",
         "task_queue": "bpg-search",

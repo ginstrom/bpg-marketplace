@@ -1,4 +1,4 @@
-# Step 8: Document Temporal Activity Adapter Expectations
+# Step 9: Document Temporal Activity Adapter Expectations
 
 ## Goal
 
@@ -39,4 +39,3 @@ The documentation should state:
 ## Notes
 
 Keep examples small. The purpose is to establish expectations for package authors before stronger verification and generated worker bindings are implemented.
-

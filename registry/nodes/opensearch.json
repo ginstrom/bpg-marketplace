@@ -1,0 +1,140 @@
+{
+  "capabilities": [
+    "hybrid_search",
+    "hybrid_upsert",
+    "bm25_search",
+    "vector_search"
+  ],
+  "compatibility": {
+    "bpg": ">=0.1.0"
+  },
+  "dependencies": {
+    "python": [
+      {
+        "name": "bpg-nodes-opensearch",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "id": "bpg.nodes.opensearch",
+  "name": "OpenSearch Nodes",
+  "nodes": [
+    {
+      "capabilities": [
+        "hybrid_search",
+        "bm25_search",
+        "vector_search"
+      ],
+      "execution": {
+        "required_secrets": [
+          "OPENSEARCH_USERNAME",
+          "OPENSEARCH_PASSWORD"
+        ],
+        "required_services": [],
+        "requires_network": true,
+        "resources": {
+          "cpu": "1000m",
+          "memory": "2Gi",
+          "timeout_seconds": 300
+        }
+      },
+      "id": "opensearch.service",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/services/opensearch.input.schema.json",
+        "output_schema": "schemas/services/opensearch.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "image": "docker.io/opensearchproject/opensearch:2.14.0",
+        "type": "service_container"
+      },
+      "side_effects": [
+        "network_io",
+        "data_write"
+      ],
+      "version": "0.1.0",
+      "worker": {
+        "image": "docker.io/opensearchproject/opensearch:2.14.0",
+        "install_mode": "container",
+        "task_queue": "bpg-opensearch-service"
+      }
+    },
+    {
+      "capabilities": [
+        "hybrid_upsert"
+      ],
+      "execution": {
+        "required_secrets": [
+          "OPENSEARCH_USERNAME",
+          "OPENSEARCH_PASSWORD"
+        ],
+        "required_services": [
+          "opensearch.service"
+        ],
+        "requires_network": true,
+        "resources": {
+          "cpu": "500m",
+          "memory": "512Mi",
+          "timeout_seconds": 120
+        }
+      },
+      "id": "opensearch.hybrid_upsert",
+      "idempotent": true,
+      "io": {
+        "input_schema": "schemas/nodes/opensearch.hybrid_upsert.input.schema.json",
+        "output_schema": "schemas/nodes/opensearch.hybrid_upsert.output.schema.json"
+      },
+      "retryable": true,
+      "runtime": {
+        "entrypoint": "bpg_nodes_opensearch.activities.hybrid_upsert",
+        "image": "ghcr.io/ginstrom/bpg-nodes-opensearch-worker:0.1.0",
+        "language": "python",
+        "task_queue": "bpg-opensearch",
+        "type": "temporal_activity"
+      },
+      "side_effects": [
+        "network_io",
+        "data_write"
+      ],
+      "version": "0.1.0"
+    }
+  ],
+  "observability": {
+    "metrics": true,
+    "traces": true
+  },
+  "package": {
+    "install": "uv add bpg-nodes-opensearch",
+    "python": "bpg-nodes-opensearch",
+    "version": "0.1.0"
+  },
+  "requirements": {
+    "secrets": [
+      "OPENSEARCH_USERNAME",
+      "OPENSEARCH_PASSWORD"
+    ]
+  },
+  "source": {
+    "artifacts": [
+      {
+        "type": "git",
+        "url": "https://github.com/example/bpg-nodes-opensearch"
+      },
+      {
+        "type": "oci",
+        "url": "docker.io/opensearchproject/opensearch:2.14.0"
+      }
+    ],
+    "repo": "https://github.com/example/bpg-nodes-opensearch"
+  },
+  "trust": {
+    "level": "community"
+  },
+  "type": "node_package",
+  "worker": {
+    "image": "ghcr.io/ginstrom/bpg-nodes-opensearch-worker:0.1.0",
+    "install_mode": "package",
+    "task_queue": "bpg-opensearch"
+  }
+}

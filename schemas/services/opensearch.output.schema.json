@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "endpoint": {
+      "format": "uri",
+      "type": "string"
+    },
+    "health": {
+      "enum": [
+        "green",
+        "yellow",
+        "red",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "service": {
+      "const": "opensearch"
+    }
+  },
+  "required": [
+    "service",
+    "endpoint",
+    "health"
+  ],
+  "title": "OpenSearch Service Output",
+  "type": "object"
+}

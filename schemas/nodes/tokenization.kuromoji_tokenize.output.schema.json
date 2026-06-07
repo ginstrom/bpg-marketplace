@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "normalized_text": {
+      "type": "string"
+    },
+    "tokens": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "token_details": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "base_form": {
+            "type": "string"
+          },
+          "part_of_speech": {
+            "type": "string"
+          },
+          "position": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "surface": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "tokens",
+    "normalized_text"
+  ],
+  "title": "Kuromoji Tokenize Output",
+  "type": "object"
+}

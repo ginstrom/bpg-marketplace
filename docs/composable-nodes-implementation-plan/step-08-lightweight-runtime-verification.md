@@ -1,4 +1,4 @@
-# Step 7: Add Lightweight Runtime Verification
+# Step 8: Add Lightweight Runtime Verification
 
 ## Goal
 
@@ -16,7 +16,7 @@ This step adds optional checks suitable for marketplace CI and for BPG's build f
 4. Verify Python activity entrypoints can be imported when dependencies are installed.
 5. Verify container image references are syntactically valid.
 6. Optionally verify container image reachability when network access is enabled.
-7. Verify recipe references and mappings using the validation from Step 6.
+7. Verify recipe references and mappings using the validation from Step 7.
 8. Add tests with local dummy entrypoints and intentionally broken entrypoints.
 
 ## Verification Modes
@@ -37,4 +37,3 @@ Support at least two modes:
 ## Notes
 
 This step should not attempt to prove implementation correctness. It verifies that authored metadata points to plausible code and artifacts. Full behavioral testing belongs in node package repositories.
-

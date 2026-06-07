@@ -17,7 +17,8 @@ This step adds a recipe artifact and tests that it validates. It should use the 
 5. Use JSONPath mappings in each step's `with` block.
 6. Use an exact or preferred reference to `tokenization.kuromoji_tokenize`.
 7. Use an exact or preferred reference to `opensearch.hybrid_upsert`.
-8. Add tests that validate the recipe.
+8. Use a declarative edge mapping to project Kuromoji token objects into the OpenSearch token string array.
+9. Add tests that validate the recipe.
 
 ## Required Step Graph
 
@@ -25,7 +26,7 @@ The recipe should run:
 
 1. `embed`: converts `$.chunk.text` to `$.steps.embed.vector`.
 2. `tokenize`: converts `$.chunk.text` to `$.steps.tokenize.tokens`.
-3. `upsert`: writes `$.chunk.text`, `$.steps.embed.vector`, and `$.steps.tokenize.tokens` to OpenSearch.
+3. `upsert`: writes `$.chunk.text`, `$.steps.embed.vector`, and projected token surfaces from `$.steps.tokenize.tokens` to OpenSearch.
 
 ## Acceptance Criteria
 
@@ -33,8 +34,22 @@ The recipe should run:
 - Every exact node reference can resolve to a registry node.
 - Every version constraint can resolve to at least one node version.
 - Every JSONPath reference points to a declared recipe input or prior step output.
+- The token mapping documents the Kuromoji-to-OpenSearch adaptation instead of requiring a separate adapter node.
 
 ## Notes
 
 This recipe should remain smaller than a full RAG template. It describes indexing one chunk, not ingestion, evaluation, or retrieval.
 
+If Step 5 has not landed yet, this recipe may temporarily use plain JSONPath strings. Once declarative edge mappings are available, the upsert step should use a mapping object such as:
+
+```json
+{
+  "tokens": {
+    "from": "$.steps.tokenize.tokens",
+    "transform": {
+      "type": "map",
+      "path": "$.surface"
+    }
+  }
+}
+```
