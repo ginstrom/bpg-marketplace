@@ -37,7 +37,7 @@ Remaining polish, documentation drift, and deferred enforcement from the impleme
 - [x] [Follow-Up 7: Node-Level Worker Override Tests](follow-up-07-test-node-level-worker-override.md)
 - [x] [Follow-Up 8: Transform Type Integration Tests](follow-up-08-integration-tests-transform-types.md)
 - [x] [Follow-Up 9: Index Reproducibility in CI](follow-up-09-index-reproducibility-ci.md)
-- [ ] [Follow-Up 10: Runtime-Light Verification Expectations](follow-up-10-runtime-light-verification-expectations.md)
+- [x] [Follow-Up 10: Runtime-Light Verification Expectations](follow-up-10-runtime-light-verification-expectations.md)
 
 ## Expected End State
 

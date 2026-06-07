@@ -40,7 +40,7 @@ Complete the checkboxes as work lands.
 
 ### Verification
 
-- [ ] [Follow-Up 10: Clarify Runtime-Light Verification Expectations](follow-up-10-runtime-light-verification-expectations.md)
+- [x] [Follow-Up 10: Clarify Runtime-Light Verification Expectations](follow-up-10-runtime-light-verification-expectations.md)
 
 ## Suggested Order of Work
 

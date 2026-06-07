@@ -362,6 +362,47 @@ At runtime:
 
 Service dependencies are resolved in the same plan but are provisioned and wired into worker environments rather than invoked as workflow steps.
 
+## Verification modes
+
+The marketplace provides two verification modes via `scripts/verify_registry.py`:
+
+| Context | Mode | Notes |
+| --- | --- | --- |
+| Marketplace CI | `static` | Validates metadata, schemas, image references, and entrypoint strings |
+| Node package repo CI | `runtime-light` | Run after `pip install` of the package; imports entrypoints |
+| BPG build flow | `runtime-light` or stricter | Packages available in the build environment |
+| Local authoring | `static` always; `runtime-light` when package installed | See commands below |
+
+### Commands
+
+```bash
+# Always run in marketplace and node repos
+python3 scripts/verify_registry.py --mode static
+
+# Run in node package repo after install
+pip install -e .
+python3 scripts/verify_registry.py --mode runtime-light
+```
+
+### What runtime-light checks
+
+- Python entrypoint importability when the declaring package is installed
+- Entrypoint callable shape (when implemented)
+- Image reference reachability (optional, when enabled)
+
+Static mode does not import entrypoints. It validates that metadata, schema references, and declared strings are well-formed.
+
+### Expected behavior in this repository
+
+Marketplace CI runs `--mode static` only. Node implementation packages (`bpg_nodes_search`, `bpg_nodes_opensearch`, `bpg_nodes_audit`, and others) are not installed in this repository.
+
+Running `python3 scripts/verify_registry.py --mode runtime-light` locally without those packages installed will report import failures. That is expected behavior, not a marketplace bug. Node package authors should run runtime-light verification in their own repository after `pip install -e .`.
+
+### Future work (BPG repository)
+
+- `bpg marketplace verify` CLI wrapping the library API
+- Monorepo CI job that syncs marketplace metadata and runs runtime-light with all packages installed
+
 ## Related documentation
 
 - [Composable Nodes and Recipes](composable-nodes-and-recipes.md)
