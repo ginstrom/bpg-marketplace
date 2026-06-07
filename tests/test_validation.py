@@ -215,3 +215,147 @@ class ValidationTests(unittest.TestCase):
                 preferred_node = step["select"]["preferred_node"]
                 capability = step["select"]["capability"]
                 self.assertIn(capability, node_capabilities[preferred_node])
+
+    def test_registry_validation_rejects_unknown_exact_recipe_node(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "basic-rag-search.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][0]["select"] = {
+                "node": "missing.node",
+                "version": ">=0.1.0",
+            }
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].select.node 'missing.node' does not resolve to a node" in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_unknown_preferred_recipe_node(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "basic-rag-search.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][0]["select"]["preferred_node"] = "missing.node"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].select.preferred_node 'missing.node' does not resolve to a node"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_impossible_recipe_node_version(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][0]["select"]["version"] = ">=9.0.0"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].select.preferred_node 'embedding.create_text_embedding' has no version matching '>=9.0.0'"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_future_step_mapping_reference(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][0]["with"]["text"] = "$.steps.upsert.result"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].with.text: source '$.steps.upsert.result' does not reference a prior step output"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_bad_jsonpath_mapping_reference(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][0]["with"]["text"] = "$.chunk[0].text"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].with.text: source '$.chunk[0].text' is not in the supported JSONPath subset"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_missing_required_node_input(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            del recipe["steps"][0]["with"]["model"]
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].with.model is required by selected node input schema" in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_missing_referenced_io_schema(self):
+        with isolated_repo() as repo:
+            node_path = repo / "registry" / "nodes" / "weaviate.json"
+            node_package = json.loads(node_path.read_text(encoding="utf-8"))
+            node_package["nodes"][1]["io"]["input_schema"] = "schemas/nodes/missing.schema.json"
+            node_path.write_text(json.dumps(node_package, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[0].referenced IO schema 'schemas/nodes/missing.schema.json' does not exist"
+                    in issue.message
+                    for issue in issues
+                )
+            )
+
+    def test_registry_validation_rejects_incompatible_projection_transform(self):
+        with isolated_repo() as repo:
+            recipe_path = repo / "registry" / "recipes" / "opensearch-hybrid-index-japanese-chunk.json"
+            recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+            recipe["steps"][2]["with"]["tokens"]["transform"]["path"] = "$.position"
+            recipe_path.write_text(json.dumps(recipe, indent=2), encoding="utf-8")
+
+            issues = validate_registry(repo)
+
+            self.assertTrue(
+                any(
+                    issue.artifact_type == "recipe"
+                    and "steps[2].with.tokens is incompatible with selected node input schema" in issue.message
+                    for issue in issues
+                )
+            )

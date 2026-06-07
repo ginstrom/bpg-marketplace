@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import re
+from typing import Any
 
 from .registry import iter_registry_files, load_json
 
@@ -11,6 +13,17 @@ class ValidationIssue:
     artifact_type: str
     path: str
     message: str
+
+
+@dataclass(frozen=True)
+class NodeRecord:
+    node: dict
+
+
+@dataclass(frozen=True)
+class MappingSource:
+    root: str
+    path: list[str]
 
 
 def load_schema(artifact_type: str, root: Path | None = None) -> dict:
@@ -383,6 +396,411 @@ def _validate_recipe_mapping_transform(prefix: str, transform: object) -> list[s
     return errors
 
 
+def _parse_version(version: str) -> tuple[int, ...] | None:
+    match = re.match(r"^v?(\d+(?:\.\d+){0,2})(?:[-+].*)?$", version)
+    if not match:
+        return None
+    parts = tuple(int(part) for part in match.group(1).split("."))
+    return parts + (0,) * (3 - len(parts))
+
+
+def _version_matches(version: str, constraint: str | None) -> bool:
+    if not constraint:
+        return True
+    version_parts = _parse_version(version)
+    constraint = constraint.strip()
+    match = re.match(r"^(>=|<=|>|<|==|=)?\s*v?(\d+(?:\.\d+){0,2})(?:[-+].*)?$", constraint)
+    if not match or version_parts is None:
+        return version == constraint
+    operator = match.group(1) or "=="
+    expected_parts = _parse_version(match.group(2))
+    if expected_parts is None:
+        return version == constraint
+    if operator in {"=", "=="}:
+        return version_parts == expected_parts
+    if operator == ">=":
+        return version_parts >= expected_parts
+    if operator == "<=":
+        return version_parts <= expected_parts
+    if operator == ">":
+        return version_parts > expected_parts
+    if operator == "<":
+        return version_parts < expected_parts
+    return False
+
+
+def _build_node_catalog(
+    artifacts: list[tuple[str, Path, dict]],
+) -> tuple[dict[str, list[NodeRecord]], dict[str, list[NodeRecord]]]:
+    by_id: dict[str, list[NodeRecord]] = {}
+    by_capability: dict[str, list[NodeRecord]] = {}
+    for artifact_type, path, payload in artifacts:
+        if artifact_type != "node_package":
+            continue
+        for node in payload.get("nodes", []):
+            if not isinstance(node, dict) or not isinstance(node.get("id"), str):
+                continue
+            record = NodeRecord(node=node)
+            by_id.setdefault(node["id"], []).append(record)
+            for capability in node.get("capabilities", []):
+                if isinstance(capability, str):
+                    by_capability.setdefault(capability, []).append(record)
+    return by_id, by_capability
+
+
+def _load_schema_ref(root: Path, ref: str) -> tuple[dict | None, str | None]:
+    path = root / ref
+    if not path.exists():
+        return None, f"referenced IO schema '{ref}' does not exist"
+    try:
+        schema = load_json(path)
+    except Exception as exc:  # pragma: no cover - defensive around malformed authored JSON.
+        return None, f"referenced IO schema '{ref}' could not be loaded: {exc}"
+    if not isinstance(schema, dict):
+        return None, f"referenced IO schema '{ref}' must contain a JSON object"
+    return schema, None
+
+
+def _schema_type(schema: dict | None) -> str | list[str] | None:
+    if not isinstance(schema, dict):
+        return None
+    if "const" in schema:
+        return _json_type_name(schema["const"])
+    if "enum" in schema and schema["enum"]:
+        return _json_type_name(schema["enum"][0])
+    return schema.get("type")
+
+
+def _json_type_name(value: Any) -> str:
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, int) and not isinstance(value, bool):
+        return "integer"
+    if isinstance(value, float):
+        return "number"
+    if isinstance(value, str):
+        return "string"
+    if isinstance(value, list):
+        return "array"
+    if isinstance(value, dict):
+        return "object"
+    return "null"
+
+
+def _type_set(schema: dict | None) -> set[str]:
+    schema_type = _schema_type(schema)
+    if isinstance(schema_type, str):
+        return {schema_type}
+    if isinstance(schema_type, list):
+        return {item for item in schema_type if isinstance(item, str)}
+    return set()
+
+
+def _types_compatible(source: dict | None, target: dict | None) -> bool:
+    source_types = _type_set(source)
+    target_types = _type_set(target)
+    if not source_types or not target_types:
+        return True
+    if source_types & target_types:
+        if "array" in source_types and "array" in target_types:
+            return _types_compatible(
+                source.get("items") if source else None,
+                target.get("items") if target else None,
+            )
+        return True
+    if source_types == {"integer"} and "number" in target_types:
+        return True
+    return False
+
+
+def _schema_at_path(schema: dict | None, path: list[str]) -> dict | None:
+    current = schema
+    for segment in path:
+        if not isinstance(current, dict):
+            return None
+        if _schema_type(current) == "array":
+            current = current.get("items")
+        if not isinstance(current, dict):
+            return None
+        properties = current.get("properties")
+        if not isinstance(properties, dict) or segment not in properties:
+            return None
+        current = properties[segment]
+    return current if isinstance(current, dict) else None
+
+
+def _parse_mapping_source(value: str) -> MappingSource | None:
+    if not value.startswith("$"):
+        return None
+    if value.startswith("$inputs."):
+        raw = value.removeprefix("$inputs.")
+        root = "inputs"
+    elif value.startswith("$.steps."):
+        raw = value.removeprefix("$.steps.")
+        root = "steps"
+    elif value.startswith("$."):
+        raw = value.removeprefix("$.")
+        root = "inputs"
+    else:
+        return None
+    if not raw:
+        return None
+    parts = raw.split(".")
+    if not all(re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", part) for part in parts):
+        return None
+    return MappingSource(root=root, path=parts)
+
+
+def _literal_schema(value: Any) -> dict:
+    if isinstance(value, bool):
+        return {"type": "boolean"}
+    if isinstance(value, int) and not isinstance(value, bool):
+        return {"type": "integer"}
+    if isinstance(value, float):
+        return {"type": "number"}
+    if isinstance(value, str):
+        return {"type": "string"}
+    if isinstance(value, list):
+        return {"type": "array"}
+    if isinstance(value, dict):
+        return {"type": "object"}
+    return {}
+
+
+def _apply_transform_schema(source_schema: dict | None, transform: object) -> dict | None:
+    if not isinstance(transform, dict):
+        return source_schema
+    transform_type = transform.get("type")
+    if transform_type == "map":
+        if not isinstance(source_schema, dict) or _schema_type(source_schema) != "array":
+            return None
+        item_schema = source_schema.get("items")
+        projected = _schema_at_path(item_schema if isinstance(item_schema, dict) else None, _transform_path(transform))
+        return {"type": "array", "items": projected} if projected else None
+    if transform_type == "project":
+        return _schema_at_path(source_schema, _transform_path(transform))
+    if transform_type == "default":
+        return _literal_schema(transform.get("value"))
+    if transform_type == "coerce":
+        target_type = transform.get("to")
+        return {"type": target_type} if isinstance(target_type, str) else None
+    return None
+
+
+def _transform_path(transform: dict) -> list[str]:
+    path = transform.get("path")
+    if not isinstance(path, str):
+        return []
+    if path.startswith("$."):
+        path = path[2:]
+    return [part for part in path.split(".") if part]
+
+
+def _recipe_input_root_schema(recipe: dict) -> dict:
+    inputs = recipe.get("inputs")
+    return {
+        "type": "object",
+        "properties": inputs if isinstance(inputs, dict) else {},
+    }
+
+
+def _resolve_step_records(
+    recipe: dict,
+    step: dict,
+    by_id: dict[str, list[NodeRecord]],
+    by_capability: dict[str, list[NodeRecord]],
+) -> tuple[list[NodeRecord], list[str]]:
+    errors: list[str] = []
+    select = step.get("select")
+    if not isinstance(select, dict):
+        return [], errors
+
+    version_constraint = select.get("version") if isinstance(select.get("version"), str) else None
+    if "node" in select:
+        node_id = select.get("node")
+        records = list(by_id.get(node_id, []))
+        if not records:
+            errors.append(f"select.node '{node_id}' does not resolve to a node")
+            return [], errors
+        matches = [record for record in records if _version_matches(record.node.get("version", ""), version_constraint)]
+        if not matches:
+            errors.append(
+                f"select.node '{node_id}' has no version matching '{version_constraint}'"
+            )
+        return matches, errors
+
+    capability = select.get("capability")
+    records = list(by_capability.get(capability, []))
+    if not records:
+        errors.append(f"select.capability '{capability}' does not resolve to any node")
+        return [], errors
+
+    preferred_node = select.get("preferred_node")
+    if preferred_node:
+        preferred_records = list(by_id.get(preferred_node, []))
+        if not preferred_records:
+            errors.append(f"select.preferred_node '{preferred_node}' does not resolve to a node")
+            return [], errors
+        if not any(capability in record.node.get("capabilities", []) for record in preferred_records):
+            errors.append(
+                f"select.preferred_node '{preferred_node}' does not provide capability '{capability}'"
+            )
+            return [], errors
+        records = preferred_records
+
+    matches = [
+        record
+        for record in records
+        if capability in record.node.get("capabilities", [])
+        and _version_matches(record.node.get("version", ""), version_constraint)
+    ]
+    if not matches:
+        target = f"preferred_node '{preferred_node}'" if preferred_node else f"capability '{capability}'"
+        errors.append(f"select.{target} has no version matching '{version_constraint}'")
+    return matches, errors
+
+
+def _source_schema_for_mapping(
+    source: str,
+    recipe: dict,
+    prior_outputs: dict[str, dict],
+) -> tuple[dict | None, str | None]:
+    parsed = _parse_mapping_source(source)
+    if not parsed:
+        return None, f"source '{source}' is not in the supported JSONPath subset"
+
+    if parsed.root == "inputs":
+        input_name = parsed.path[0]
+        input_schema = _schema_at_path(_recipe_input_root_schema(recipe), [input_name])
+        if input_schema is None:
+            return None, f"source '{source}' does not reference a declared recipe input"
+        return _schema_at_path(input_schema, parsed.path[1:]) if len(parsed.path) > 1 else input_schema, None
+
+    step_id = parsed.path[0]
+    if step_id not in prior_outputs:
+        return None, f"source '{source}' does not reference a prior step output"
+    output_schema = prior_outputs[step_id]
+    field_schema = _schema_at_path(output_schema, parsed.path[1:])
+    if field_schema is None:
+        return None, f"source '{source}' does not exist in step '{step_id}' output schema"
+    return field_schema, None
+
+
+def _validate_step_mapping_compatibility(
+    recipe: dict,
+    step: dict,
+    step_index: int,
+    input_schema: dict,
+    prior_outputs: dict[str, dict],
+) -> list[str]:
+    errors: list[str] = []
+    mappings = step.get("with", {})
+    mappings = mappings if isinstance(mappings, dict) else {}
+    target_properties = input_schema.get("properties") if isinstance(input_schema, dict) else {}
+    target_properties = target_properties if isinstance(target_properties, dict) else {}
+    required = input_schema.get("required") if isinstance(input_schema, dict) else []
+    required = required if isinstance(required, list) else []
+
+    for field in required:
+        if isinstance(field, str) and field not in mappings:
+            errors.append(f"steps[{step_index}].with.{field} is required by selected node input schema")
+
+    for field, mapping in mappings.items():
+        target_schema = target_properties.get(field)
+        if target_schema is None:
+            continue
+        field_prefix = f"steps[{step_index}].with.{field}"
+        if isinstance(mapping, str) and mapping.startswith("$"):
+            source_schema, error = _source_schema_for_mapping(mapping, recipe, prior_outputs)
+            if error:
+                errors.append(f"{field_prefix}: {error}")
+                continue
+            mapped_schema = source_schema
+        elif isinstance(mapping, dict):
+            source = mapping.get("from")
+            if not isinstance(source, str):
+                continue
+            source_schema, error = _source_schema_for_mapping(source, recipe, prior_outputs)
+            if error:
+                errors.append(f"{field_prefix}: {error}")
+                continue
+            mapped_schema = _apply_transform_schema(source_schema, mapping.get("transform"))
+            if mapped_schema is None:
+                errors.append(f"{field_prefix}.transform is incompatible with source '{source}'")
+                continue
+        else:
+            mapped_schema = _literal_schema(mapping)
+
+        if not _types_compatible(mapped_schema, target_schema):
+            errors.append(f"{field_prefix} is incompatible with selected node input schema")
+
+    return errors
+
+
+def _validate_registry_references(
+    root: Path,
+    artifacts: list[tuple[str, Path, dict]],
+) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+    by_id, by_capability = _build_node_catalog(artifacts)
+    service_nodes = {
+        node_id
+        for node_id, records in by_id.items()
+        if any(record.node.get("runtime", {}).get("type") == "service_container" for record in records)
+    }
+
+    for artifact_type, path, recipe in artifacts:
+        if artifact_type != "recipe" or not isinstance(recipe.get("steps"), list):
+            continue
+        prior_outputs: dict[str, dict] = {}
+        for step_index, step in enumerate(recipe["steps"]):
+            if not isinstance(step, dict):
+                continue
+            records, errors = _resolve_step_records(recipe, step, by_id, by_capability)
+            for error in errors:
+                issues.append(ValidationIssue("recipe", str(path), f"steps[{step_index}].{error}"))
+            if not records:
+                continue
+
+            selected = records[0]
+            io = selected.node.get("io") if isinstance(selected.node.get("io"), dict) else {}
+            input_schema_ref = io.get("input_schema")
+            output_schema_ref = io.get("output_schema")
+            input_schema: dict | None = None
+            output_schema: dict | None = None
+            if isinstance(input_schema_ref, str):
+                input_schema, error = _load_schema_ref(root, input_schema_ref)
+                if error:
+                    issues.append(ValidationIssue("recipe", str(path), f"steps[{step_index}].{error}"))
+            if isinstance(output_schema_ref, str):
+                output_schema, error = _load_schema_ref(root, output_schema_ref)
+                if error:
+                    issues.append(ValidationIssue("recipe", str(path), f"steps[{step_index}].{error}"))
+
+            for service in selected.node.get("execution", {}).get("required_services", []):
+                if service not in service_nodes:
+                    issues.append(
+                        ValidationIssue(
+                            "recipe",
+                            str(path),
+                            f"steps[{step_index}].execution.required_services '{service}' does not resolve to a service_container node",
+                        )
+                    )
+
+            if input_schema:
+                for error in _validate_step_mapping_compatibility(
+                    recipe,
+                    step,
+                    step_index,
+                    input_schema,
+                    prior_outputs,
+                ):
+                    issues.append(ValidationIssue("recipe", str(path), error))
+            if output_schema and isinstance(step.get("id"), str):
+                prior_outputs[step["id"]] = output_schema
+    return issues
+
+
 def validate_artifact(artifact_type: str, payload: dict) -> list[str]:
     validators = {
         "node_package": _validate_node_package,
@@ -397,9 +815,12 @@ def validate_artifact(artifact_type: str, payload: dict) -> list[str]:
 def validate_registry(root: Path | None = None) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     seen_ids: dict[str, str] = {}
+    root = root or Path(__file__).resolve().parents[2]
+    artifacts: list[tuple[str, Path, dict]] = []
 
     for artifact_type, path in iter_registry_files(root):
         payload = load_json(path)
+        artifacts.append((artifact_type, path, payload))
         for message in validate_artifact(artifact_type, payload):
             issues.append(
                 ValidationIssue(
@@ -418,8 +839,9 @@ def validate_registry(root: Path | None = None) -> list[ValidationIssue]:
                         artifact_type=artifact_type,
                         path=str(path),
                         message=f"duplicate artifact id '{artifact_id}' already seen in {previous}",
-                    )
                 )
+            )
             seen_ids[artifact_id] = str(path)
 
+    issues.extend(_validate_registry_references(root, artifacts))
     return issues

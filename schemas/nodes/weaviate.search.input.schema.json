@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "query": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "top_k": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "title": "Weaviate Search Input",
+  "type": "object"
+}

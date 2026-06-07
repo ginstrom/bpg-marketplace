@@ -22,7 +22,7 @@
       "id": "retrieve",
       "select": {
         "capability": "vector_search",
-        "preferred_node": "bpg.nodes.weaviate",
+        "preferred_node": "weaviate.search",
         "version": ">=0.1.0"
       },
       "with": {
