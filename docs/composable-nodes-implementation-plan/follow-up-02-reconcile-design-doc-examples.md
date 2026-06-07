@@ -2,7 +2,14 @@
 
 [Documentation](../index.md) › [Implementation Plan](index.md) › [Follow-Up Work](follow-up-work.md) › Follow-Up 2: Reconcile Design Doc Examples
 
-**Status:** [ ] Not started
+**Status:** [x] Complete
+
+## Delivered
+
+- Capability naming: `tokenization` (not `japanese_tokenization`)
+- `preferred_node`: string + sibling `version` on `select`
+- Version constraints: compound ranges supported (`>=1.2,<2.0`)
+- Added "Implemented today" notes for BPG-side execution plan generation
 
 ## Goal
 

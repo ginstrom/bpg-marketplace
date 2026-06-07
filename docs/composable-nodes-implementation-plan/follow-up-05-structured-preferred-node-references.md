@@ -2,7 +2,11 @@
 
 [Documentation](../index.md) › [Implementation Plan](index.md) › [Follow-Up Work](follow-up-work.md) › Follow-Up 5: Structured `preferred_node` References
 
-**Status:** [ ] Not started
+**Status:** [x] Complete
+
+## Delivered
+
+Documented the string + sibling `version` form as canonical in `docs/composable-nodes-and-recipes.md`. No schema changes required.
 
 ## Goal
 

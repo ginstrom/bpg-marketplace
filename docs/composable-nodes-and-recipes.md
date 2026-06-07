@@ -126,7 +126,7 @@ Example node metadata:
 ```json
 {
   "id": "tokenization.kuromoji_tokenize",
-  "capabilities": ["tokenization", "japanese_tokenization"],
+  "capabilities": ["tokenization"],
   "runtime": {
     "type": "temporal_activity",
     "language": "python",
@@ -174,14 +174,14 @@ and:
 ```json
 {
   "select": {
-    "capability": "japanese_tokenization",
-    "preferred_node": {
-      "id": "tokenization.kuromoji_tokenize",
-      "version": ">=1.2,<2.0"
-    }
+    "capability": "tokenization",
+    "preferred_node": "tokenization.kuromoji_tokenize",
+    "version": ">=1.2,<2.0"
   }
 }
 ```
+
+`preferred_node` is a string node id with an optional sibling `version` constraint on `select`. This mirrors the `select.node` + `select.version` pattern and keeps the recipe schema flat. The registry and resolution index use this form consistently.
 
 The marketplace registry can expose available versions, but BPG should resolve them during its build flow into a locked execution plan. That plan should record exact package versions, container digests, node ids, node versions, schema versions, and selected defaults.
 
@@ -248,20 +248,30 @@ Recipe:
   "summary": "Embeds a text chunk, tokenizes it for Japanese BM25 search, and writes both lexical and vector fields to OpenSearch.",
   "capabilities": [
     "hybrid_search",
+    "hybrid_upsert",
     "embedding",
-    "japanese_tokenization",
-    "vector_upsert"
+    "tokenization"
   ],
   "inputs": {
-    "chunk": "object",
-    "index": "string",
-    "embedding_model": "string"
+    "chunk": {
+      "type": "object",
+      "required": ["id", "text"],
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "index": { "type": "string" },
+    "embedding_model": { "type": "string" }
   },
   "steps": [
     {
       "id": "embed",
       "select": {
-        "capability": "embedding"
+        "capability": "embedding",
+        "preferred_node": "embedding.create_text_embedding",
+        "version": ">=0.1.0,<1.0.0"
       },
       "with": {
         "text": "$.chunk.text",
@@ -271,23 +281,33 @@ Recipe:
     {
       "id": "tokenize",
       "select": {
-        "capability": "japanese_tokenization",
-        "preferred_node": "tokenization.kuromoji_tokenize"
+        "capability": "tokenization",
+        "preferred_node": "tokenization.kuromoji_tokenize",
+        "version": ">=0.1.0,<1.0.0"
       },
       "with": {
-        "text": "$.chunk.text"
+        "text": "$.chunk.text",
+        "mode": "search"
       }
     },
     {
       "id": "upsert",
       "select": {
-        "preferred_node": "opensearch.hybrid_upsert"
+        "capability": "hybrid_upsert",
+        "preferred_node": "opensearch.hybrid_upsert",
+        "version": ">=0.1.0,<1.0.0"
       },
       "with": {
         "index": "$.index",
         "id": "$.chunk.id",
         "text": "$.chunk.text",
-        "tokens": "$.steps.tokenize.tokens",
+        "tokens": {
+          "from": "$.steps.tokenize.token_details",
+          "transform": {
+            "type": "map",
+            "path": "$.surface"
+          }
+        },
         "vector": "$.steps.embed.vector",
         "metadata": "$.chunk.metadata"
       }
@@ -410,6 +430,8 @@ For example, a Kuromoji tokenizer may return rich token objects, while an OpenSe
 
 BPG should compile simple declarative mappings into the locked execution plan. The generated plan may contain internal adapter operations, but the marketplace should not require a separate adapter artifact for every field projection.
 
+**Implemented today:** The marketplace validates declarative mappings and records them in `generated/resolution.json`. BPG compilation of transforms into internal adapter operations is planned in the BPG repository.
+
 Use declarative mappings for:
 
 * field projection
@@ -435,6 +457,8 @@ Later semantics can include:
 The first implementation should avoid a full workflow language. Recipes should be structured enough for build-time plan generation, code generation, and discovery, but not so expressive that the marketplace becomes a workflow engine.
 
 ## Build-Time Execution Plans
+
+**Implemented today:** The marketplace generates `generated/resolution.json` with node resolution metadata, recipe step mappings, and capability indexes. Locked execution plan generation from that metadata is planned in the BPG repository.
 
 BPG should generate execution plans as part of its terraform-like build flow.
 
@@ -562,17 +586,13 @@ Recommended marketplace types:
 
 Recipes should be allowed in packs and templates. Templates should be allowed to reference recipes directly.
 
-## Implementation Direction
+## Implementation Status
 
-The next design-to-implementation pass should break this into:
+The marketplace foundation described in this document is implemented. See the [Composable Nodes Implementation Plan](composable-nodes-implementation-plan/index.md) for step-by-step delivery history and [Follow-Up Work](composable-nodes-implementation-plan/follow-up-work.md) for remaining polish.
 
-1. add `recipe` registry directory and schema
-2. extend node schema with runtime, IO, execution, artifacts, and dependencies
-3. add sample atomic search nodes
-4. add sample Japanese hybrid indexing recipe
-5. add declarative edge mappings and generated internal adapter semantics
-6. update index generation to include recipes and capability resolution metadata
-7. update validation to catch invalid node references, recipe step references, and incompatible mappings
-8. add CI checks that rebuild ignored generated indexes from checked-in registry metadata
-9. add CI checks for declared Python entrypoints and container references
-10. document Temporal activity adapter expectations for node packages
+Remaining BPG-side work (out of scope for this repository):
+
+- locked execution plan generation from `generated/resolution.json`
+- compilation of declarative mapping transforms into internal adapter operations
+- generated workflow/activity bindings
+- worker image digest pinning at build time

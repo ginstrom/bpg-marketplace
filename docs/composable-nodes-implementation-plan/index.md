@@ -23,13 +23,13 @@ Remaining polish, documentation drift, and deferred enforcement from the impleme
 ### Documentation
 
 - [x] [Follow-Up 1: Update Capability Taxonomy](follow-up-01-update-capability-taxonomy.md)
-- [ ] [Follow-Up 2: Reconcile Design Doc Examples](follow-up-02-reconcile-design-doc-examples.md)
+- [x] [Follow-Up 2: Reconcile Design Doc Examples](follow-up-02-reconcile-design-doc-examples.md)
 - [ ] [Follow-Up 3: Expand Contributing Guidance](follow-up-03-expand-contributing-guidance.md)
 
 ### Validation and Schema
 
-- [ ] [Follow-Up 4: Compound Version Constraints](follow-up-04-compound-version-constraints.md)
-- [ ] [Follow-Up 5: Structured `preferred_node` References](follow-up-05-structured-preferred-node-references.md)
+- [x] [Follow-Up 4: Compound Version Constraints](follow-up-04-compound-version-constraints.md)
+- [x] [Follow-Up 5: Structured `preferred_node` References](follow-up-05-structured-preferred-node-references.md)
 - [ ] [Follow-Up 6: `external_service` Registry Example](follow-up-06-external-service-registry-example.md)
 
 ### Test Coverage and Verification
