@@ -119,7 +119,7 @@ For example, an enterprise RAG template might use a search recipe, an approval p
 
 ### Atomic Node Execution
 
-For Temporal-backed BPG systems, each runnable node should have a Temporal activity adapter.
+For Temporal-backed [BPG](https://github.com/ginstrom/bpg) systems, each runnable node should have a Temporal activity adapter.
 
 Example node metadata:
 
@@ -183,7 +183,7 @@ and:
 
 `preferred_node` is a string node id with an optional sibling `version` constraint on `select`. This mirrors the `select.node` + `select.version` pattern and keeps the recipe schema flat. The registry and resolution index use this form consistently.
 
-The marketplace registry can expose available versions, but BPG should resolve them during its build flow into a locked execution plan. That plan should record exact package versions, container digests, node ids, node versions, schema versions, and selected defaults.
+The marketplace registry can expose available versions, but [BPG](https://github.com/ginstrom/bpg) should resolve them during its build flow into a locked execution plan. That plan should record exact package versions, container digests, node ids, node versions, schema versions, and selected defaults.
 
 Breaking changes to node input/output contracts should require a major version change. Non-breaking additions can be minor versions if old recipe mappings remain valid.
 
@@ -403,7 +403,7 @@ Minimum useful semantics:
 * `defaults`: recommended parameters
 * `failure_policy`: retry, fallback, and compensation behavior
 
-Data mapping should use a standard format. JSONPath is the preferred default because recipe inputs, step outputs, and generated execution plans are JSON-shaped, and JSONPath is widely recognizable to both humans and tooling. BPG should define the supported JSONPath subset rather than accepting every dialect-specific extension.
+Data mapping should use a standard format. JSONPath is the preferred default because recipe inputs, step outputs, and generated execution plans are JSON-shaped, and JSONPath is widely recognizable to both humans and tooling. [BPG](https://github.com/ginstrom/bpg) should define the supported JSONPath subset rather than accepting every dialect-specific extension.
 
 ### Declarative Edge Mappings and Adapters
 
@@ -430,9 +430,9 @@ For example, a Kuromoji tokenizer may return rich token objects, while an OpenSe
 }
 ```
 
-BPG should compile simple declarative mappings into the locked execution plan. The generated plan may contain internal adapter operations, but the marketplace should not require a separate adapter artifact for every field projection.
+[BPG](https://github.com/ginstrom/bpg) should compile simple declarative mappings into the locked execution plan. The generated plan may contain internal adapter operations, but the marketplace should not require a separate adapter artifact for every field projection.
 
-**Implemented today:** The marketplace validates declarative mappings and records them in `generated/resolution.json`. BPG compilation of transforms into internal adapter operations is planned in the BPG repository.
+**Implemented today:** The marketplace validates declarative mappings and records them in `generated/resolution.json`. [BPG](https://github.com/ginstrom/bpg) compilation of transforms into internal adapter operations is planned in the [BPG repository](https://github.com/ginstrom/bpg).
 
 Use declarative mappings for:
 
@@ -460,9 +460,9 @@ The first implementation should avoid a full workflow language. Recipes should b
 
 ## Build-Time Execution Plans
 
-**Implemented today:** The marketplace generates `generated/resolution.json` with node resolution metadata, recipe step mappings, and capability indexes. Locked execution plan generation from that metadata is planned in the BPG repository.
+**Implemented today:** The marketplace generates `generated/resolution.json` with node resolution metadata, recipe step mappings, and capability indexes. Locked execution plan generation from that metadata is planned in the [BPG repository](https://github.com/ginstrom/bpg).
 
-BPG should generate execution plans as part of its terraform-like build flow.
+[BPG](https://github.com/ginstrom/bpg) should generate execution plans as part of its terraform-like build flow.
 
 The marketplace recipe is the authored, reusable intent:
 
@@ -472,7 +472,7 @@ The marketplace recipe is the authored, reusable intent:
 * mapping rules
 * operational defaults
 
-The BPG build output is the deployable plan:
+The [BPG](https://github.com/ginstrom/bpg) build output is the deployable plan:
 
 * exact node ids
 * exact node versions
@@ -494,7 +494,7 @@ Capability tags should match the vocabulary in [Capability Taxonomy](capability-
 
 When a recipe selects by capability, the marketplace consumer should resolve candidates using:
 
-1. BPG compatibility
+1. [BPG](https://github.com/ginstrom/bpg) compatibility
 2. required runtime type
 3. required language or worker environment
 4. required secrets and services
@@ -529,7 +529,7 @@ Trust metadata should eventually account for:
 
 Community packages can be discoverable with minimal checks. Verified and blessed packages should require stronger checks.
 
-Schema compatibility should be enforced by BPG during build-time plan generation. The marketplace should still provide lightweight authoring checks so contributors can verify node packages before publishing.
+Schema compatibility should be enforced by [BPG](https://github.com/ginstrom/bpg) during build-time plan generation. The marketplace should still provide lightweight authoring checks so contributors can verify node packages before publishing.
 
 Useful lightweight checks:
 
@@ -541,7 +541,7 @@ Useful lightweight checks:
 * verify declarative mapping transforms are in the supported subset
 * check that exact node references and version constraints can resolve against the local registry
 
-These checks should be available both in marketplace CI and from BPG, for example as a `bpg marketplace verify` or equivalent build-time command.
+These checks should be available both in marketplace CI and from [BPG](https://github.com/ginstrom/bpg), for example as a `bpg marketplace verify` or equivalent build-time command.
 
 ## Observability
 
@@ -592,7 +592,7 @@ Recipes should be allowed in packs and templates. Templates should be allowed to
 
 The marketplace foundation described in this document is implemented. See the [Composable Nodes Implementation Plan](composable-nodes-implementation-plan/index.md) for step-by-step delivery history and [Follow-Up Work](composable-nodes-implementation-plan/follow-up-work.md) for remaining polish.
 
-Remaining BPG-side work (out of scope for this repository):
+Remaining [BPG](https://github.com/ginstrom/bpg)-side work (out of scope for this repository):
 
 - locked execution plan generation from `generated/resolution.json`
 - compilation of declarative mapping transforms into internal adapter operations

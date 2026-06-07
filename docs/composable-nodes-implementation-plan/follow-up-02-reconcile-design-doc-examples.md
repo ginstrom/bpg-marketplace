@@ -9,7 +9,7 @@
 - Capability naming: `tokenization` (not `japanese_tokenization`)
 - `preferred_node`: string + sibling `version` on `select`
 - Version constraints: compound ranges supported (`>=1.2,<2.0`)
-- Added "Implemented today" notes for BPG-side execution plan generation
+- Added "Implemented today" notes for [BPG](https://github.com/ginstrom/bpg)-side execution plan generation
 
 ## Goal
 
@@ -38,7 +38,7 @@ The design doc contains aspirational examples that differ from current behavior:
   - `registry/recipes/opensearch-hybrid-index-japanese-chunk.json`
   - `registry/nodes/bpg-nodes-search.json`
   - `registry/nodes/opensearch.json`
-- [ ] Add a short "Implemented today" note where the design doc describes future BPG behavior (locked execution plans, generated adapters).
+- [ ] Add a short "Implemented today" note where the design doc describes future [BPG](https://github.com/ginstrom/bpg) behavior (locked execution plans, generated adapters).
 - [ ] Link to [Follow-Up 4](follow-up-04-compound-version-constraints.md) and [Follow-Up 5](follow-up-05-structured-preferred-node-references.md) if those steps change the canonical forms.
 
 ## Decision Points
@@ -64,7 +64,7 @@ Choose one path per item and record the decision in the design doc or a brief no
 
 ## Notes
 
-Default recommendation from the audit: update the design doc to match the implemented schema unless BPG consumers already depend on the richer forms.
+Default recommendation from the audit: update the design doc to match the implemented schema unless [BPG](https://github.com/ginstrom/bpg) consumers already depend on the richer forms.
 
 ## References
 

@@ -53,16 +53,16 @@ Complete the checkboxes as work lands.
 7. [Follow-Up 10](follow-up-10-runtime-light-verification-expectations.md) — verification usage documentation.
 8. [Follow-Up 6](follow-up-06-external-service-registry-example.md) — when a real external dependency is available.
 
-## Out of Scope (BPG Repository)
+## Out of Scope ([BPG repository](https://github.com/ginstrom/bpg))
 
-These items are noted for coordination but belong in BPG, not `bpg-marketplace`:
+These items are noted for coordination but belong in [BPG](https://github.com/ginstrom/bpg), not `bpg-marketplace`:
 
 - Locked execution plan generation from `generated/resolution.json`
 - Compilation of declarative mapping transforms into internal adapter operations
 - Generated workflow/activity bindings
 - Worker image digest pinning at build time
 - `bpg marketplace verify` CLI wrapping the library API
-- Optional BPG monorepo CI job running runtime-light against synced marketplace metadata
+- Optional [BPG](https://github.com/ginstrom/bpg) monorepo CI job running runtime-light against synced marketplace metadata
 
 ## References
 

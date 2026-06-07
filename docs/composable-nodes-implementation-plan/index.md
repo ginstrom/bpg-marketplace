@@ -1,6 +1,6 @@
 # Composable Nodes Implementation Plan
 
-This plan breaks [Composable Nodes and Recipes](../composable-nodes-and-recipes.md) into self-contained implementation steps.
+This plan breaks [Composable Nodes and Recipes](../composable-nodes-and-recipes.md) into self-contained implementation steps for the [BPG](https://github.com/ginstrom/bpg) marketplace.
 
 Each step is intended to be small enough to hand to an engineer. Complete the checkboxes as work lands.
 
@@ -46,7 +46,7 @@ After these steps, the marketplace should support:
 - `recipe` artifacts in the registry.
 - Versioned node references and capability-based recipe selectors.
 - Runtime metadata for Temporal activities, service containers, external services, workers, IO schemas, and dependencies.
-- Build-time inputs that BPG can turn into locked execution plans.
+- Build-time inputs that [BPG](https://github.com/ginstrom/bpg) can turn into locked execution plans.
 - Declarative edge mappings for simple output-to-input adaptation, with internal plan adapters generated only when needed.
-- Lightweight authoring checks that can run in marketplace CI or from BPG.
+- Lightweight authoring checks that can run in marketplace CI or from [BPG](https://github.com/ginstrom/bpg).
 - CI coverage that validates ignored generated index files can be rebuilt from checked-in registry metadata.

@@ -38,7 +38,7 @@ Live registry recipes use the string form (see `registry/recipes/opensearch-hybr
 
 ## Tasks
 
-- [ ] Confirm no downstream BPG consumer requires the object form.
+- [ ] Confirm no downstream [BPG](https://github.com/ginstrom/bpg) consumer requires the object form.
 - [ ] Choose one canonical approach (see Options below).
 - [ ] If **document string form**:
   - [ ] Update design doc examples.
@@ -56,7 +56,7 @@ Live registry recipes use the string form (see `registry/recipes/opensearch-hybr
 
 | Option | Effort | Recommendation |
 | --- | --- | --- |
-| Document string + sibling `version` as canonical | Low | Preferred unless BPG requires object form |
+| Document string + sibling `version` as canonical | Low | Preferred unless [BPG](https://github.com/ginstrom/bpg) requires object form |
 | Support both shapes in schema and validation | Medium | Only if backward compatibility with unpublished design doc consumers is needed |
 | Object form only | High | Not recommended; breaks existing registry recipes |
 

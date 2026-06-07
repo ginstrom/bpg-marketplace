@@ -55,5 +55,5 @@ Only one of `select.capability` or `select.node` should be required for each ste
 
 ## Notes
 
-Keep this step schema-focused. Do not add a full workflow language. The recipe model should remain structured intent for later BPG build-time resolution.
+Keep this step schema-focused. Do not add a full workflow language. The recipe model should remain structured intent for later [BPG](https://github.com/ginstrom/bpg) build-time resolution.
 

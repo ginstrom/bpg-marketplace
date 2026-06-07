@@ -2,7 +2,7 @@
 
 ## Overview
 
-`bpg-marketplace` is a GitHub-native registry and discovery system for reusable BPG workflow components, operational capabilities, templates, and integrations.
+`bpg-marketplace` is a GitHub-native registry and discovery system for reusable [BPG](https://github.com/ginstrom/bpg) workflow components, operational capabilities, templates, and integrations.
 
 The marketplace is designed for both:
 
@@ -211,7 +211,7 @@ Example packages:
 
 # 2. Recipes
 
-Composable capability plans that describe how smaller nodes should be assembled during the BPG build flow.
+Composable capability plans that describe how smaller nodes should be assembled during the [BPG](https://github.com/ginstrom/bpg) build flow.
 
 Recipes represent:
 
@@ -495,7 +495,7 @@ The marketplace should support multiple trust levels.
 
 # Blessed
 
-* Recommended by BPG maintainers
+* Recommended by [BPG](https://github.com/ginstrom/bpg) maintainers
 * Operationally mature
 * Production-tested
 * Maintained compatibility

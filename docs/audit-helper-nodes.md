@@ -4,7 +4,7 @@ Optional marketplace nodes for post-run audit export, verification, compliance r
 
 ## Runtime capture stays mandatory
 
-BPG captures audit records in the runtime. The Postgres audit ledger, OpenTelemetry traces, and local `events.jsonl` replay log are written independently of marketplace nodes.
+[BPG](https://github.com/ginstrom/bpg) captures audit records in the runtime. The Postgres audit ledger, OpenTelemetry traces, and local `events.jsonl` replay log are written independently of marketplace nodes.
 
 These helper nodes are **reporting and export utilities**. Users can omit them without disabling core audit capture. Do not use marketplace nodes as the primary implementation for:
 
@@ -12,7 +12,7 @@ These helper nodes are **reporting and export utilities**. Users can omit them w
 - `record_approval_for_compliance`
 - `trace_workflow`
 
-Those responsibilities belong in the BPG runtime.
+Those responsibilities belong in the [BPG](https://github.com/ginstrom/bpg) runtime.
 
 ## Package
 
@@ -67,5 +67,6 @@ See [examples/observability/post-run-audit-reporting.v2.bpg.yaml](../examples/ob
 
 ## Related documentation
 
+- [BPG](https://github.com/ginstrom/bpg) — workflow platform and runtime
 - [BPG CLI: bpg audit](https://github.com/ginstrom/bpg/blob/main/docs/cli/audit.md)
 - [Traceability and Auditability Design](https://github.com/ginstrom/bpg/blob/main/docs/design/traceability-and-auditability.md)
